@@ -25,7 +25,7 @@ DB_PATH = PROJECT_ROOT / os.getenv("DB_PATH", "data/myntra_discovery.db")
 # Google Gemini (Free Tier)
 # ──────────────────────────────────────────────
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
-LLM_MODEL = os.getenv("LLM_MODEL", "gemini-3.6-flash")
+LLM_MODEL = os.getenv("LLM_MODEL", "gemini-3.5-flash")
 LLM_RPM_LIMIT = int(os.getenv("LLM_RPM_LIMIT", "15"))
 LLM_DAILY_TOKEN_LIMIT = int(os.getenv("LLM_DAILY_TOKEN_LIMIT", "1000000"))
 

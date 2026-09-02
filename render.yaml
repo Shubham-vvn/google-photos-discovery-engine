@@ -24,7 +24,7 @@ services:
       - key: DB_PATH
         value: data/myntra_discovery.db
       - key: LLM_MODEL
-        value: gemini-3.6-flash
+        value: gemini-3.5-flash
       - key: LLM_RPM_LIMIT
         value: "15"
       - key: LLM_DAILY_TOKEN_LIMIT
