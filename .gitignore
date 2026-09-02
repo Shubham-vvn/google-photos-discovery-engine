@@ -1,0 +1,54 @@
+# Python
+venv/
+.venv/
+env/
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+dist/
+build/
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Environment and Secrets (CRITICAL: Never commit)
+.env
+.env.local
+.env.*.local
+*.pem
+*.key
+
+# Data & Database (large binary files, not committed)
+data/raw/
+data/processed/
+data/*.db
+data/*.sqlite
+data/*.sqlite3
+
+# Node / Frontend builds
+node_modules/
+dashboard/node_modules/
+dashboard/.next/
+dashboard/out/
+
+# IDE & Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Operating System files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Scratch & Logs
+scratch/
+*.log
+logs/

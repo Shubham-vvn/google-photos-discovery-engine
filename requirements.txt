@@ -1,0 +1,30 @@
+# ── FastAPI / Dashboard ──
+fastapi==0.112.0
+uvicorn[standard]==0.30.6
+jinja2==3.1.4
+python-multipart==0.0.9
+
+# ── Scraping ──
+google-play-scraper==1.2.7
+praw==7.7.1
+
+# ── Text Processing ──
+beautifulsoup4==4.12.3
+ftfy==6.2.3
+emoji==2.12.1
+datasketch==1.6.4
+
+# ── AI / LLM ──
+google-generativeai==0.8.3
+sentence-transformers==3.0.1
+chromadb==0.5.5
+
+# ── Utilities ──
+python-dotenv==1.0.1
+pyyaml==6.0.2
+tqdm==4.66.5
+scikit-learn==1.5.1
+
+# ── Testing ──
+pytest==8.3.2
+httpx==0.27.0

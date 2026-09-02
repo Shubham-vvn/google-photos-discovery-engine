@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Myntra AI Discovery Engine — Customer Hesitation & Conversion Insights</title>
+  <link rel="stylesheet" href="/static/css/style.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+</head>
+<body>
+
+  <!-- Background Glow Accents -->
+  <div class="bg-glow-1"></div>
+  <div class="bg-glow-2"></div>
+
+  <!-- Sidebar Navigation -->
+  <aside class="sidebar">
+    <div class="brand-container">
+      <div class="brand-logo-badge">M</div>
+      <div class="brand-text">
+        <h1>Myntra Discovery</h1>
+        <p>AI Customer Engine</p>
+      </div>
+    </div>
+
+    <div class="nav-section-title">Discovery Insights</div>
+    <ul class="nav-links">
+      <li>
+        <a href="#overview" class="nav-link active" data-tab="overview">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+          <span>Overview</span>
+        </a>
+      </li>
+      <li>
+        <a href="#blockers" class="nav-link" data-tab="blockers">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>
+          <span>Purchase Blockers</span>
+        </a>
+      </li>
+      <li>
+        <a href="#uncertainties" class="nav-link" data-tab="uncertainties">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+          <span>Uncertainty Matrix</span>
+        </a>
+      </li>
+      <li>
+        <a href="#personas" class="nav-link" data-tab="personas">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          <span>Shopper Personas</span>
+        </a>
+      </li>
+      <li>
+        <a href="#discovery" class="nav-link" data-tab="discovery">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 2a7 7 0 0 1 7 7c0 2.38-1.19 4.47-3 5.74V17a2 2 0 0 1-2 2H10a2 2 0 0 1-2-2v-2.26C6.19 13.47 5 11.38 5 9a7 7 0 0 1 7-7z"/><line x1="10" y1="22" x2="14" y2="22"/><line x1="9" y1="17" x2="15" y2="17"/><path d="M12 2v3"/><path d="M5.6 5.6l2.1 2.1"/><path d="M18.4 5.6l-2.1 2.1"/></svg>
+          <span>AI Discovery Engine</span>
+        </a>
+      </li>
+    </ul>
+    <!-- Mobile Close Button -->
+    <button class="sidebar-close-btn" onclick="toggleMobileSidebar()" aria-label="Close menu">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+  </aside>
+
+  <!-- Mobile Sidebar Overlay -->
+  <div class="sidebar-overlay" onclick="toggleMobileSidebar()"></div>
+
+  <!-- Main Content Wrapper -->
+  <div class="main-wrapper">
+    
+    <!-- Top Bar -->
+    <header class="top-bar">
+      <div class="page-title-wrapper">
+        <button class="hamburger-btn" onclick="toggleMobileSidebar()" aria-label="Open menu">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+        </button>
+        <h2 id="top-bar-title">Discovery Engine Overview</h2>
+      </div>
+      <div class="top-actions">
+        <div class="status-badge">
+          <div class="status-dot"></div>
+          <span>AI Engine Active</span>
+        </div>
+        <button class="btn btn-secondary" onclick="loadOverviewData()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+          <span>Refresh</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="content-container">
+
+      <!-- ──────────────────────────────────────────────
+           TAB 1: OVERVIEW
+           ────────────────────────────────────────────── -->
+      <section id="tab-overview" class="tab-pane active">
+        
+        <!-- Hero Card -->
+        <div class="hero-card">
+          <div class="hero-content">
+            <h3>Why Myntra Users Wishlist but Don't Buy</h3>
+            <p>Discovered from real public customer behavior, reviews, and hesitation signals — analyzed with Gemini and local semantic taxonomy mapping.</p>
+          </div>
+        </div>
+
+        <!-- 4 Key Stat Cards -->
+        <div class="stat-grid">
+          <div class="stat-card">
+            <div class="stat-header">
+              <span class="stat-title">Ingested Documents</span>
+              <div class="stat-icon-badge stat-icon-blue">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+              </div>
+            </div>
+            <div class="stat-value" id="stat-total-docs">--</div>
+            <div class="stat-desc">Raw customer comments & reviews</div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-header">
+              <span class="stat-title">AI Extractions</span>
+              <div class="stat-icon-badge stat-icon-emerald">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+              </div>
+            </div>
+            <div class="stat-value" id="stat-total-extractions">--</div>
+            <div class="stat-desc">Structured insight records</div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-header">
+              <span class="stat-title">Avg Confidence</span>
+              <div class="stat-icon-badge stat-icon-purple">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+              </div>
+            </div>
+            <div class="stat-value" id="stat-avg-conf">--</div>
+            <div class="stat-desc">4-factor weighted score</div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-header">
+              <span class="stat-title">Data Sources</span>
+              <div class="stat-icon-badge stat-icon-pink">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/></svg>
+              </div>
+            </div>
+            <div class="stat-value" style="font-size: 20px; line-height: 1.6;" id="stat-sources">Google Play</div>
+            <div class="stat-desc">Multi-channel ingestion</div>
+          </div>
+        </div>
+
+        <!-- Charts Row -->
+        <div class="charts-grid">
+          <div class="chart-card">
+            <div class="chart-header">
+              <div class="chart-title">
+                <h4>Top Conversion Blockers</h4>
+                <p>Ranked by occurrence count and weighted impact</p>
+              </div>
+            </div>
+            <div class="chart-container">
+              <canvas id="chart-top-blockers"></canvas>
+            </div>
+          </div>
+
+          <div class="chart-card">
+            <div class="chart-header">
+              <div class="chart-title">
+                <h4>Confidence Distribution</h4>
+                <p>Extraction reliability breakdown</p>
+              </div>
+            </div>
+            <div class="chart-container">
+              <canvas id="chart-confidence-dist"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <!-- Recent Blocker Feed -->
+        <div class="chart-card">
+          <div class="chart-header">
+            <div class="chart-title">
+              <h4>Discovered Pattern Signals</h4>
+              <p>Top clusters currently impacting wishlist checkout</p>
+            </div>
+          </div>
+          <div id="recent-feed-container"></div>
+        </div>
+
+      </section>
+
+      <!-- ──────────────────────────────────────────────
+           TAB 2: PURCHASE BLOCKERS
+           ────────────────────────────────────────────── -->
+      <section id="tab-blockers" class="tab-pane">
+        <div class="hero-card">
+          <div class="hero-content">
+            <h3>Discovered Purchase Blockers</h3>
+            <p>Every blocker mapped to canonical taxonomy with occurrence counts, confidence metrics, and real customer voice snippets.</p>
+          </div>
+        </div>
+        <div class="blocker-list" id="blockers-list-container"></div>
+      </section>
+
+      <!-- ──────────────────────────────────────────────
+           TAB 3: UNCERTAINTIES
+           ────────────────────────────────────────────── -->
+      <section id="tab-uncertainties" class="tab-pane">
+        <div class="hero-card">
+          <div class="hero-content">
+            <h3>Customer Uncertainty Dimensions</h3>
+            <p>Breakdown of non-monetary doubt factors: Trust, Quality, Fit, Availability, and Price-Value perception.</p>
+          </div>
+        </div>
+        <div class="chart-card" style="min-height: 480px;">
+          <div class="chart-container">
+            <canvas id="chart-uncertainty-radar"></canvas>
+          </div>
+        </div>
+      </section>
+
+      <!-- ──────────────────────────────────────────────
+           TAB 4: PERSONAS
+           ────────────────────────────────────────────── -->
+      <section id="tab-personas" class="tab-pane">
+        <div class="hero-card">
+          <div class="hero-content">
+            <h3>Shopper Personas & Hesitation Patterns</h3>
+            <p>Behavioral clustering and persona × blocker cross-tabulation discovered from user language.</p>
+          </div>
+        </div>
+
+        <!-- Persona Cards Grid -->
+        <div class="stat-grid" id="persona-cards-container" style="margin-bottom: 28px;"></div>
+
+        <!-- Cross-Tabulation Table -->
+        <div class="chart-card">
+          <div class="chart-header">
+            <div class="chart-title">
+              <h4>Persona × Blocker Cross-Tabulation</h4>
+              <p>Which blockers affect which shopper types the most</p>
+            </div>
+          </div>
+          <div id="crosstab-container"></div>
+        </div>
+      </section>
+
+      <!-- ──────────────────────────────────────────────
+           TAB 5: AI DISCOVERY ENGINE
+           ────────────────────────────────────────────── -->
+      <section id="tab-discovery" class="tab-pane">
+        <div class="hero-card">
+          <div class="hero-content">
+            <h3>🧠 AI Discovery Engine</h3>
+            <p>Ask any question about Myntra's wishlist-to-purchase journey. The engine searches our research database of real customer reviews and behavioral analysis, then synthesizes a comprehensive answer powered by Gemini AI.</p>
+          </div>
+        </div>
+
+        <!-- Example Question Chips -->
+        <div class="discovery-chips-container">
+          <span class="discovery-chips-label">Try asking:</span>
+          <div class="discovery-chips">
+            <button class="discovery-chip" data-question="What are the top reasons users don't buy wishlisted items?">🛒 Why don't users buy wishlisted items?</button>
+            <button class="discovery-chip" data-question="What do users say about size and fit concerns on Myntra?">📏 Size & fit concerns</button>
+            <button class="discovery-chip" data-question="How does Myntra compare to AJIO for wishlist experience?">⚔️ Myntra vs AJIO</button>
+            <button class="discovery-chip" data-question="What feature requests do users mention most for Myntra wishlist?">💡 Feature requests</button>
+            <button class="discovery-chip" data-question="What triggers users to finally purchase from their wishlist?">🎯 Purchase triggers</button>
+            <button class="discovery-chip" data-question="How do first-time buyers differ from repeat shoppers on Myntra?">👥 New vs repeat shoppers</button>
+            <button class="discovery-chip" data-question="What are the main delivery related concerns users have?">🚚 Delivery concerns</button>
+            <button class="discovery-chip" data-question="What emotional sentiment do users express about the wishlist experience?">💭 User sentiment</button>
+          </div>
+        </div>
+
+        <!-- Chat Input Area -->
+        <div class="discovery-input-container">
+          <div class="discovery-input-wrapper">
+            <svg class="discovery-input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M12 2a7 7 0 0 1 7 7c0 2.38-1.19 4.47-3 5.74V17a2 2 0 0 1-2 2H10a2 2 0 0 1-2-2v-2.26C6.19 13.47 5 11.38 5 9a7 7 0 0 1 7-7z"/>
+              <line x1="10" y1="22" x2="14" y2="22"/>
+            </svg>
+            <input type="text" id="discovery-question-input" class="discovery-input" placeholder="Ask anything about Myntra's wishlist research data..." autocomplete="off">
+            <button id="discovery-ask-btn" class="discovery-ask-btn" onclick="askDiscoveryEngine()">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- Answer Display Area -->
+        <div id="discovery-answer-area" class="discovery-answer-area" style="display: none;">
+          <!-- Source Badge -->
+          <div id="discovery-source-badge" class="discovery-source-badge"></div>
+          <!-- Answer Content -->
+          <div id="discovery-answer-content" class="discovery-answer-content"></div>
+        </div>
+
+        <!-- Evidence Cards (shown when answer is research-backed) -->
+        <div id="discovery-evidence-section" class="discovery-evidence-section" style="display: none;">
+          <div class="chart-header" style="margin-bottom: 16px;">
+            <div class="chart-title">
+              <h4>📎 Supporting Evidence from Research</h4>
+              <p>Real customer quotes that informed this answer</p>
+            </div>
+          </div>
+          <div id="discovery-evidence-grid" class="evidence-grid"></div>
+        </div>
+
+        <!-- Loading State -->
+        <div id="discovery-loading" class="discovery-loading" style="display: none;">
+          <div class="discovery-loading-spinner"></div>
+          <div class="discovery-loading-text">
+            <p class="discovery-loading-title">Analyzing research data...</p>
+            <p class="discovery-loading-subtitle">Searching customer reviews and synthesizing insights</p>
+          </div>
+        </div>
+
+      </section>
+
+    </main>
+  </div>
+
+  <script src="/static/js/app.js"></script>
+</body>
+</html>

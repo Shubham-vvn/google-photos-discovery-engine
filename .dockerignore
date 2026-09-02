@@ -1,0 +1,22 @@
+# Ignore these for Docker builds
+venv/
+.env
+__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
+data/*.db
+data/raw/
+data/processed/
+.DS_Store
+.git/
+.gitignore
+*.md
+!README.md
+*.txt
+!requirements.txt
+dashboard/node_modules/
+dashboard/.next/
+dashboard/out/
+.vscode/
+.idea/

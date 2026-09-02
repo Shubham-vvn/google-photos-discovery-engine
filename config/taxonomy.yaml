@@ -1,0 +1,47 @@
+# ============================================================
+# Myntra Discovery Engine — Canonical Taxonomy
+# ============================================================
+# This taxonomy is a LIVING DOCUMENT. It starts with educated
+# categories but is designed to grow as new patterns emerge
+# from real user data. When the classifier finds extractions
+# that don't map to any existing tag, they are flagged as
+# "emerging patterns" for human review.
+# ============================================================
+
+# Why users DON'T complete the purchase after wishlisting
+purchase_blockers:
+  - fit_uncertainty          # "not sure if it will fit"
+  - size_uncertainty         # "size chart seems off"
+  - quality_doubt            # "quality looks questionable"
+  - color_mismatch_fear      # "worried color won't match photos"
+  - price_not_justified      # "too expensive for what it is"
+  - occasion_mismatch        # "not sure if it suits the occasion"
+  - waiting_for_sale         # "waiting for price drop" (tracked, not solved with discounts)
+  - need_external_opinion    # "need to ask friend/family first"
+  - forgotten_wishlist       # "forgot I had it wishlisted"
+  - mood_board_usage         # "just saving for inspiration, not buying"
+  - trust_in_reviews         # "reviews seem fake/unreliable"
+  - stock_availability       # "my size/color not available"
+  - delivery_uncertainty     # "not sure about delivery timeline"
+  - return_policy_concern    # "worried about return/exchange hassle"
+
+# What kind of doubt or hesitation the user expresses
+uncertainty_types:
+  - fit                      # Will it fit my body?
+  - quality                  # Is the material/build good?
+  - price                    # Is it worth the money?
+  - occasion                 # Is it right for the event?
+  - trust                    # Can I trust the reviews/seller?
+  - availability             # Will it be in stock?
+  - durability               # Will it last?
+  - styling                  # Will it look good on me?
+
+# What type of shopper this person appears to be
+shopper_personas:
+  - budget_conscious         # Price-sensitive, compares deals
+  - occasion_shopper         # Buys for specific events (wedding, festival)
+  - inspiration_browser      # Browses for ideas, may not intend to buy
+  - brand_loyal              # Sticks to specific brands
+  - trend_follower           # Buys trending/viral items
+  - gifter                   # Shopping for someone else
+  - impulse_saver            # Adds to wishlist on impulse, rarely buys

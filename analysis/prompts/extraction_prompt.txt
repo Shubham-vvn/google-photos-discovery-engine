@@ -1,0 +1,74 @@
+You are analyzing a real user's public review or comment about Myntra
+(one of India's largest online fashion and lifestyle platforms).
+
+Your task: Extract structured insights about the user's WISHLIST behaviour —
+why they save items, what stops them from buying, and what pain points they
+experience. Be precise — only extract what the text explicitly states or
+strongly implies. If you cannot determine a field, set it to null.
+
+Extract the following fields as valid JSON:
+
+1. "wishlist_motivation" (string | null)
+   Why did the user save/wishlist this product?
+   Example: "liked the design", "planning for wedding", "comparing options",
+   "saving for later", "bookmarking inspiration", "waiting for price drop"
+
+2. "purchase_blocker" (string | null)
+   What is stopping them from buying? Be specific.
+   Example: "unsure if size will fit", "quality looks questionable in photos",
+   "price went up after wishlisting", "item went out of stock"
+
+3. "uncertainty_type" (array of strings | null)
+   What kind of doubt do they express? Pick from:
+   [fit, quality, price, occasion, trust, availability, durability, styling]
+   Can be multiple. Only include what the text supports.
+
+4. "shopper_persona" (string | null)
+   What type of shopper does this person seem to be? Pick from:
+   [budget_conscious, occasion_shopper, inspiration_browser, brand_loyal,
+    trend_follower, gifter, impulse_saver]
+
+5. "evidence_type" (string)
+   How confident is this extraction? Pick one:
+   - "direct_statement" → user explicitly says this
+   - "inference" → strongly implied but not directly said
+   - "weak_signal" → vague or tangential hint
+
+6. "wishlist_pain_point" (string | null)
+   Any specific frustration with the wishlist feature itself.
+   Example: "wishlist items disappear", "can't organize wishlist",
+   "too many items in wishlist", "no price drop notification",
+   "wishlist limit reached", "hard to find saved items"
+
+7. "price_behavior" (string | null)
+   Any mention of price-related behavior after wishlisting.
+   Example: "price increased after adding to wishlist",
+   "waiting for sale/discount", "price dropped but missed it"
+
+8. "feature_request" (string | null)
+   Any specific feature the user wishes existed.
+   Example: "want size recommendation", "need price drop alerts",
+   "want to share wishlist", "need better filters"
+
+9. "competitor_mention" (string | null)
+   Did they mention any competitor? If so, which one and in what context?
+   Example: "AJIO has better return policy", "Amazon delivers faster",
+   "Flipkart has better prices"
+
+Return ONLY valid JSON. No explanation, no markdown. Example format:
+{
+  "wishlist_motivation": "liked the ethnic design for festive season",
+  "purchase_blocker": "worried the fabric quality won't match the photos",
+  "uncertainty_type": ["quality", "trust"],
+  "shopper_persona": "occasion_shopper",
+  "evidence_type": "direct_statement",
+  "wishlist_pain_point": "items keep going out of stock in wishlist",
+  "price_behavior": "price increased after wishlisting",
+  "feature_request": "want price drop alerts for wishlisted items",
+  "competitor_mention": "AJIO has better size charts"
+}
+
+User text to analyze:
+"""
+{user_text}
+"""
