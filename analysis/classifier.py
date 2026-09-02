@@ -10,22 +10,36 @@ from typing import Any, Dict, List, Optional
 
 import numpy as np
 import yaml
-from sentence_transformers import SentenceTransformer
+from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 
 from config.settings import TAXONOMY_PATH
+
+try:
+    from sentence_transformers import SentenceTransformer
+    HAS_SENTENCE_TRANSFORMERS = True
+except ImportError:
+    HAS_SENTENCE_TRANSFORMERS = False
 
 
 class Classifier:
     """Maps LLM extraction outputs to canonical taxonomy tags."""
 
     def __init__(self):
-        # Load local embedding model (free, runs on CPU, ~80MB)
-        print("   📦 Loading embedding model (all-MiniLM-L6-v2)...")
-        self.model = SentenceTransformer("all-MiniLM-L6-v2")
         self.taxonomy = self._load_taxonomy()
+        self.model = None
+        self.mode = "tfidf"
+
+        if HAS_SENTENCE_TRANSFORMERS:
+            try:
+                print("   📦 Loading embedding model (all-MiniLM-L6-v2)...")
+                self.model = SentenceTransformer("all-MiniLM-L6-v2")
+                self.mode = "embedding"
+            except Exception:
+                self.mode = "tfidf"
+
         self.tag_embeddings = self._precompute_embeddings()
-        print("   ✅ Classifier ready")
+        print(f"   ✅ Classifier ready (mode: {self.mode})")
 
     def _load_taxonomy(self) -> Dict[str, List[str]]:
         with open(TAXONOMY_PATH, "r") as f:
@@ -37,14 +51,21 @@ class Classifier:
         return taxonomy
 
     def _precompute_embeddings(self) -> Dict[str, Any]:
-        """Pre-compute embeddings for all taxonomy tags (done once at startup)."""
+        """Pre-compute embeddings/vectors for all taxonomy tags."""
         embeddings = {}
         for category, tags in self.taxonomy.items():
             tag_texts = [tag.replace("_", " ") for tag in tags]
-            embs = self.model.encode(tag_texts)
+            if self.mode == "embedding" and self.model:
+                embs = self.model.encode(tag_texts)
+                vectorizer = None
+            else:
+                vectorizer = TfidfVectorizer(ngram_range=(1, 2))
+                embs = vectorizer.fit_transform(tag_texts).toarray()
+
             embeddings[category] = {
                 "tags": tags,
                 "embeddings": embs,
+                "vectorizer": vectorizer,
             }
         return embeddings
 
@@ -86,18 +107,26 @@ class Classifier:
         return tags
 
     def _find_closest_tag(
-        self, text: str, category: str, threshold: float = 0.3
+        self, text: str, category: str, threshold: float = 0.15
     ) -> Optional[str]:
-        """Find the closest canonical tag using embedding similarity."""
+        """Find the closest canonical tag using embedding or TF-IDF similarity."""
         if category not in self.tag_embeddings:
             return None
 
-        text_emb = self.model.encode([text])
-        cat_embs = self.tag_embeddings[category]["embeddings"]
+        cat_info = self.tag_embeddings[category]
+        cat_embs = cat_info["embeddings"]
 
-        # Guard against empty embeddings
         if len(cat_embs) == 0:
             return None
+
+        clean_text = str(text).replace("_", " ")
+        if self.mode == "embedding" and self.model:
+            text_emb = self.model.encode([clean_text])
+        else:
+            vectorizer = cat_info.get("vectorizer")
+            if vectorizer is None:
+                return None
+            text_emb = vectorizer.transform([clean_text]).toarray()
 
         similarities = cosine_similarity(text_emb, cat_embs)[0]
 
@@ -105,5 +134,5 @@ class Classifier:
         best_score = float(similarities[best_idx])
 
         if best_score >= threshold:
-            return self.tag_embeddings[category]["tags"][best_idx]
+            return cat_info["tags"][best_idx]
         return None  # No close match — potential "emerging pattern"
