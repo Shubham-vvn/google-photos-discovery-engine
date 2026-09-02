@@ -257,13 +257,12 @@ RELEVANT CUSTOMER QUOTES & EVIDENCE:
 USER QUESTION: {question}
 
 INSTRUCTIONS:
-1. Answer the question using the research data and customer evidence provided above.
-2. Structure your answer clearly with headers, bullet points, and bold text for key findings.
-3. Cite specific customer quotes when available (use blockquote formatting with >).
-4. Include relevant statistics (percentages, counts) from the data.
-5. End with actionable "Product Recommendations" where appropriate.
-6. Keep the tone professional and insightful — like a PM presenting findings to stakeholders.
-7. Format the response in Markdown.
+1. Format as an in-depth analytical article / whitepaper with rich descriptive paragraphs (DO NOT use email or memo headers like 'To:', 'From:', 'Subject:').
+2. Structure with clear narrative themes, fluid explanatory paragraphs, and bold analytical takeaways.
+3. Integrate customer verbatim quotes as highlighted blockquotes with contextual analysis of shopper psychology.
+4. Ground observations in quantitative metrics (e.g. 5,996 documents, 3,723 extractions, confidence scores).
+5. Conclude with strategic, non-monetary product interventions (enhancing trust, sizing precision, delivery clarity, and material transparency).
+6. Maintain an authoritative, insightful product narrative tone throughout.
 """
         return prompt
 
