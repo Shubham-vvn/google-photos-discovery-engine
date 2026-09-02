@@ -214,3 +214,59 @@ async def ask_discovery_engine(req: AskRequest):
         "status": "success",
         "data": result
     })
+
+
+@app.get("/api/llm-status")
+async def check_llm_status():
+    """GET /api/llm-status — Live diagnostic to verify Gemini LLM connection on Render/local."""
+    import google.generativeai as genai
+    from config.settings import GEMINI_API_KEY, LLM_MODEL
+
+    key_configured = bool(GEMINI_API_KEY and not GEMINI_API_KEY.startswith("your_"))
+    masked_key = f"{GEMINI_API_KEY[:6]}...{GEMINI_API_KEY[-4:]}" if (GEMINI_API_KEY and len(GEMINI_API_KEY) > 10) else None
+
+    if not key_configured:
+        return JSONResponse({
+            "status": "error",
+            "connected": False,
+            "message": "GEMINI_API_KEY is missing or unconfigured in environment variables.",
+            "api_key_configured": False
+        }, status_code=500)
+
+    genai.configure(api_key=GEMINI_API_KEY)
+    models_to_test = [LLM_MODEL, "gemini-3.5-flash", "gemini-3.5-flash-lite", "gemini-flash-latest"]
+
+    working_model = None
+    test_error = None
+    for model_name in models_to_test:
+        if not model_name:
+            continue
+        try:
+            m = genai.GenerativeModel(model_name)
+            resp = m.generate_content("Ping")
+            if resp and hasattr(resp, "text") and resp.text:
+                working_model = model_name
+                break
+        except Exception as e:
+            test_error = str(e)
+
+    if working_model:
+        return JSONResponse({
+            "status": "success",
+            "connected": True,
+            "active_model": working_model,
+            "configured_model": LLM_MODEL,
+            "api_key_configured": True,
+            "api_key_preview": masked_key,
+            "message": f"Successfully connected to Google Gemini LLM ({working_model})"
+        })
+    else:
+        return JSONResponse({
+            "status": "error",
+            "connected": False,
+            "api_key_configured": True,
+            "api_key_preview": masked_key,
+            "error_details": test_error,
+            "message": "Gemini API key is present but failed to generate test response."
+        }, status_code=502)
+
