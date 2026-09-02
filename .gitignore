@@ -19,12 +19,13 @@ htmlcov/
 *.pem
 *.key
 
-# Data & Database (large binary files, not committed)
+# Data & Database
 data/raw/
 data/processed/
-data/*.db
 data/*.sqlite
 data/*.sqlite3
+data/*.db
+!data/myntra_discovery.db
 
 # Node / Frontend builds
 node_modules/
