@@ -1,16 +1,17 @@
 """
 Google Play Store Scraper
 
-Scrapes public user reviews for the Myntra Android application.
+Scrapes public user reviews for the Google Photos Android application.
 """
 
 from typing import Any, Dict, List, Optional
 from google_play_scraper import reviews, Sort
 from .base_scraper import BaseScraper
+from config.settings import GOOGLE_PLAY_PACKAGE
 
 
 class GooglePlayScraper(BaseScraper):
-    APP_ID = "com.myntra.android"
+    APP_ID = GOOGLE_PLAY_PACKAGE
 
     def __init__(self):
         super().__init__(source_name="google_play")

@@ -28,10 +28,10 @@ def main():
     args = parser.parse_args()
 
     print("=" * 60)
-    print("MYNTRA DISCOVERY ENGINE — WEB DASHBOARD")
+    print("GOOGLE PHOTOS DISCOVERY ENGINE & RETRIEVAL MVP")
     print("=" * 60)
     print(f"🚀 Server running at: http://{args.host}:{args.port}")
-    print("📊 API Documentation: http://{args.host}:{args.port}/docs")
+    print(f"📊 API Documentation: http://{args.host}:{args.port}/docs")
     print("=" * 60)
 
     uvicorn.run(

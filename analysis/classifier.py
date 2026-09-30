@@ -73,35 +73,54 @@ class Classifier:
         """Add canonical tags to an extraction result."""
         tags = {}
 
-        # Map purchase_blocker to canonical tag
-        if extraction.get("purchase_blocker"):
-            tags["purchase_blocker_tag"] = self._find_closest_tag(
-                extraction["purchase_blocker"], "purchase_blockers"
+        # Map retrieval failure point to canonical tag
+        if extraction.get("retrieval_failure_point"):
+            tags["failure_point_tag"] = self._find_closest_tag(
+                extraction["retrieval_failure_point"], "retrieval_failure_points"
             )
 
-        # Map uncertainty_type (already categorical, just validate)
-        if extraction.get("uncertainty_type"):
-            valid_types = self.taxonomy.get("uncertainty_types", [])
-            validated = [
-                t for t in extraction["uncertainty_type"]
-                if t in valid_types
-            ]
-            # For unrecognized types, try semantic matching
-            for t in extraction["uncertainty_type"]:
-                if t not in valid_types:
-                    matched = self._find_closest_tag(t, "uncertainty_types")
+        # Map photo category
+        if extraction.get("photo_category"):
+            tags["photo_category_tag"] = self._find_closest_tag(
+                extraction["photo_category"], "photo_categories"
+            )
+
+        # Map remembered clues
+        if extraction.get("remembered_clues"):
+            valid_clues = self.taxonomy.get("remembered_clues", [])
+            raw_clues = extraction["remembered_clues"]
+            if isinstance(raw_clues, str):
+                raw_clues = [raw_clues]
+            validated = [c for c in raw_clues if c in valid_clues]
+            for c in raw_clues:
+                if c not in valid_clues:
+                    matched = self._find_closest_tag(c, "remembered_clues")
                     if matched and matched not in validated:
                         validated.append(matched)
-            tags["uncertainty_tags"] = validated
+            tags["remembered_clue_tags"] = validated
 
-        # Map shopper_persona (already categorical, just validate)
-        if extraction.get("shopper_persona"):
-            valid_personas = self.taxonomy.get("shopper_personas", [])
-            if extraction["shopper_persona"] in valid_personas:
-                tags["persona_tag"] = extraction["shopper_persona"]
+        # Map forgotten elements
+        if extraction.get("forgotten_elements"):
+            valid_forgotten = self.taxonomy.get("forgotten_elements", [])
+            raw_forgotten = extraction["forgotten_elements"]
+            if isinstance(raw_forgotten, str):
+                raw_forgotten = [raw_forgotten]
+            validated = [f for f in raw_forgotten if f in valid_forgotten]
+            for f in raw_forgotten:
+                if f not in valid_forgotten:
+                    matched = self._find_closest_tag(f, "forgotten_elements")
+                    if matched and matched not in validated:
+                        validated.append(matched)
+            tags["forgotten_element_tags"] = validated
+
+        # Map user persona
+        if extraction.get("user_persona"):
+            valid_personas = self.taxonomy.get("user_personas", [])
+            if extraction["user_persona"] in valid_personas:
+                tags["persona_tag"] = extraction["user_persona"]
             else:
                 tags["persona_tag"] = self._find_closest_tag(
-                    extraction["shopper_persona"], "shopper_personas"
+                    extraction["user_persona"], "user_personas"
                 )
 
         return tags

@@ -1,7 +1,7 @@
 """
 Apple App Store Scraper
 
-Scrapes public user reviews for the Myntra iOS application using
+Scrapes public user reviews for the Google Photos iOS application using
 Apple's iTunes Customer Reviews RSS / JSON API.
 """
 
@@ -10,13 +10,14 @@ from typing import Any, Dict, List, Optional
 import requests
 
 from .base_scraper import BaseScraper
+from config.settings import APP_STORE_ID
 
 
 class AppStoreScraper(BaseScraper):
     """Scraper for Apple App Store (iOS) customer reviews."""
 
-    # Myntra: Fashion Shopping App on iOS App Store
-    APP_ID = "907394059"
+    # Google Photos on iOS App Store
+    APP_ID = APP_STORE_ID
 
     def __init__(self, app_id: Optional[str] = None):
         super().__init__(source_name="app_store")

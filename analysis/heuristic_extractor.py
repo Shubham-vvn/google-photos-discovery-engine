@@ -1,9 +1,9 @@
 """
-Semantic Heuristic Extractor
+Cognitive Heuristic Extractor
 
 Provides zero-cost, offline semantic extraction fallback when LLM API quota is exhausted
-or offline. Uses regex patterns and semantic sentence-transformer matching to extract
-structured insights aligned with the PM market research study requirements.
+or offline. Uses regex patterns and taxonomy matching to extract structured insights
+on cognitive photo retrieval struggles for Google Photos.
 """
 
 import re
@@ -11,65 +11,100 @@ from typing import Any, Dict, List, Optional
 
 
 class HeuristicExtractor:
-    """Extracts structured wishlist insights using rule-based NLP and taxonomy matching."""
+    """Extracts structured cognitive retrieval insights using rule-based NLP and taxonomy matching."""
 
-    # Keywords / patterns for uncertainty types
-    UNCERTAINTY_PATTERNS = {
-        "fit": [r"\bsize\b", r"\bfit\b", r"\bfitting\b", r"\btight\b", r"\bloose\b", r"\blength\b", r"\bmeasurement\b", r"\bsmall\b", r"\blarge\b", r"\bxxl\b", r"\bmedium\b"],
-        "quality": [r"\bquality\b", r"\bfabric\b", r"\bmaterial\b", r"\bcheap\b", r"\bcolor fade\b", r"\bdefect\b", r"\btorn\b", r"\bduplicate\b", r"\bfake\b", r"\btransparent\b", r"\bstitching\b"],
-        "price": [r"\bprice\b", r"\bexpensive\b", r"\bcostly\b", r"\bdiscount\b", r"\bcoupon\b", r"\boffer\b", r"\bplatform fee\b", r"\bconvenience fee\b", r"\bextra charge\b", r"\bsale\b", r"\bexpensive\b"],
-        "availability": [r"\bout of stock\b", r"\bunavailable\b", r"\bsold out\b", r"\bno stock\b", r"\bstock\b", r"\brestock\b"],
-        "trust": [r"\breturn\b", r"\brefund\b", r"\bcustomer care\b", r"\bcustomer support\b", r"\bfraud\b", r"\bscam\b", r"\bexchange\b", r"\bdelayed\b", r"\bdelivery\b", r"\bwrong item\b", r"\bused item\b"],
-        "occasion": [r"\bwedding\b", r"\bfestive\b", r"\bdiwali\b", r"\bparty\b", r"\boffice\b", r"\bcasual\b", r"\bfunction\b", r"\bbirthday\b"],
-        "durability": [r"\bdurable\b", r"\blasting\b", r"\bwashed\b", r"\bwash\b", r"\bshrink\b", r"\bfaded\b", r"\bwear and tear\b"],
-        "styling": [r"\bstyle\b", r"\bstyling\b", r"\bmatching\b", r"\blook\b", r"\bappearance\b", r"\bphotos\b", r"\binfluencer\b", r"\boutfit\b"],
+    # 1. Failure Points Patterns
+    FAILURE_PATTERNS = [
+        (r"(zero\s+results?|no\s+results?|nothing\s+shows?|can't\s+find\s+anything|empty\s+results?)", "zero_results"),
+        (r"(too\s+many|thousands?\s+of\s+photos?|scroll\s+forever|hundreds\s+of\s+pictures|overwhelm|drowning)", "overwhelming_results"),
+        (r"(doesn't\s+understand|wrong\s+results?|unrelated|literal|semantic|not\s+what\s+i\s+asked)", "semantic_misunderstanding"),
+        (r"(receipt|text\s+in\s+photo|ocr|blurry|prescription|label|screenshot\s+text)", "ocr_text_mismatch"),
+        (r"(last\s+year|months?\s+ago|date\s+wrong|years?\s+ago|timeline\s+lost|season|monsoon|winter)", "temporal_disconnect"),
+        (r"(synonym|medicine|pills?|cafe|coffee|dress|different\s+word|keyword)", "synonym_blindness"),
+        (r"(gave\s+up|scrolling\s+for\s+hours|abandon|tired\s+of\s+scrolling|impossible\s+to\s+find)", "scroll_fatigue_abandonment"),
+        (r"(memes?|whatsapp|junk|clutter|duplicates?|flood)", "false_positive_clutter"),
+    ]
+
+    # 2. Remembered Clues
+    CLUE_PATTERNS = {
+        "visual_anchor": [r"\bwhite\b", r"\bblue\b", r"\bred\b", r"\bgreen\b", r"\bblack\b", r"\byellow\b", r"\bcolor\b", r"\bstrip\b", r"\bcar\b", r"\bdoor\b", r"\bshirt\b", r"\bdress\b"],
+        "social_companion": [r"\bmom\b", r"\bdad\b", r"\bfriend\b", r"\bfriends\b", r"\bwife\b", r"\bhusband\b", r"\bkids?\b", r"\bbaby\b", r"\bfamily\b", r"\bwith\s+[a-z]+\b", r"\btogether\b"],
+        "location_vibe": [r"\bbeach\b", r"\bcafe\b", r"\brestaurant\b", r"\bsea\b", r"\bhotel\b", r"\bairport\b", r"\bmountains?\b", r"\bgoa\b", r"\bpark\b", r"\boutdoor\b"],
+        "emotional_context": [r"\bsick\b", r"\bfood\s+poisoning\b", r"\bbirthday\b", r"\bwedding\b", r"\bcelebration\b", r"\bfun\b", r"\bhospital\b", r"\bvacation\b", r"\btrip\b"],
+        "temporal_approximation": [r"\blast\s+year\b", r"\blast\s+month\b", r"\bcouple\s+years\b", r"\baround\s+diwali\b", r"\bsummer\b", r"\bmonsoon\b", r"\bwinter\b", r"\bcollege\s+days\b"],
+        "activity_context": [r"\bbreakfast\b", r"\bdinner\b", r"\bhiking\b", r"\bcooking\b", r"\bshopping\b", r"\bparty\b", r"\bdriving\b", r"\bmeeting\b"],
     }
 
-    # Personas
+    # 3. Forgotten Elements
+    FORGOTTEN_PATTERNS = {
+        "exact_date": [r"\bdon't\s+remember\s+(the\s+)?date\b", r"\bforgot\s+(which\s+)?day\b", r"\bexact\s+date\b", r"\bwhat\s+month\b"],
+        "gps_geotag": [r"\bdon't\s+remember\s+(where|the\s+city|location)\b", r"\bno\s+geotag\b", r"\bunknown\s+place\b"],
+        "album_folder_name": [r"\bwhich\s+album\b", r"\bnot\s+in\s+album\b", r"\bunorganized\b", r"\bforgot\s+folder\b"],
+        "exact_text_content": [r"\bdon't\s+remember\s+the\s+exact\s+name\b", r"\bexact\s+spelling\b", r"\bmedicine\s+name\b"],
+        "camera_device_metadata": [r"\bold\s+phone\b", r"\bbackup\b", r"\btransferred\b", r"\bwhatsapp\b", r"\bdownloaded\b"],
+    }
+
+    # 4. Photo Categories
+    CATEGORY_PATTERNS = {
+        "episodic_life_event": [r"\btrip\b", r"\bgoa\b", r"\bvacation\b", r"\bcafe\b", r"\bdinner\b", r"\bwedding\b", r"\bholiday\b", r"\btravel\b"],
+        "visual_utility_document": [r"\breceipt\b", r"\bmedicine\b", r"\bpills?\b", r"\bprescription\b", r"\bdrug\b", r"\bbill\b", r"\bdocument\b", r"\bserial\b", r"\bcontract\b", r"\bwarranty\b"],
+        "screenshot_saved_media": [r"\bscreenshot\b", r"\btwitter\b", r"\binstagram\b", r"\bbook\b", r"\brecipe\b", r"\bquote\b", r"\barticle\b"],
+        "people_and_portraits": [r"\bselfie\b", r"\bportrait\b", r"\bkid\b", r"\bchild\b", r"\bgrandma\b", r"\bdad\b", r"\bmom\b", r"\bfather\b", r"\bmother\b"],
+        "aesthetic_and_inspiration": [r"\bsunset\b", r"\barchitecture\b", r"\bdecor\b", r"\boutfit\b", r"\bwallpaper\b", r"\bdesign\b"],
+    }
+
+    # 5. User Personas
     PERSONA_PATTERNS = {
-        "budget_conscious": [r"\bprice\b", r"\bexpensive\b", r"\bdiscount\b", r"\bcoupon\b", r"\bworth\b", r"\bvalue for money\b", r"\bcheap\b", r"\bdeal\b", r"\bfee\b", r"\bcashback\b"],
-        "occasion_shopper": [r"\bwedding\b", r"\bfestive\b", r"\bevent\b", r"\bparty\b", r"\bcelebration\b", r"\bdiwali\b", r"\beid\b", r"\bfunction\b"],
-        "inspiration_browser": [r"\bwishlist\b", r"\bsave\b", r"\bsaved\b", r"\bbrowse\b", r"\bcollection\b", r"\blater\b", r"\blook\b", r"\binspiration\b", r"\bbookmark\b"],
-        "brand_loyal": [r"\bbrand\b", r"\bquality\b", r"\boriginal\b", r"\bgenuine\b", r"\btrusted\b", r"\blevis\b", r"\bnike\b", r"\bpuma\b", r"\bzara\b", r"\bh&m\b"],
-        "trend_follower": [r"\btrend\b", r"\btrendy\b", r"\blatest\b", r"\bfashion\b", r"\binfluencer\b", r"\bviral\b", r"\bnew arrival\b"],
+        "life_documenter": [r"\bthousand", r"\bphotos\b", r"\btimeline\b", r"\beveryday\b", r"\bevery\s+trip\b", r"\bhuge\s+library\b"],
+        "visual_note_taker": [r"\breceipt\b", r"\bmedicine\b", r"\bnote\b", r"\bwhiteboard\b", r"\bdocument\b", r"\bbill\b", r"\bpill\b"],
+        "nostalgia_seeker": [r"\byears\s+ago\b", r"\bold\s+memory\b", r"\bchildhood\b", r"\bcollege\b", r"\bremember\s+when\b", r"\breminisce\b"],
+        "screenshot_curator": [r"\bscreenshot\b", r"\bsaved\s+image\b", r"\btwitter\b", r"\binstagram\b", r"\bweb\b"],
+        "family_archivist": [r"\bchildren\b", r"\bkids?\b", r"\bfamily\b", r"\bgrowing\s+up\b", r"\bparents\b", r"\balbum\b"],
     }
-
-    # Wishlist Pain Points
-    WISHLIST_PAIN_PATTERNS = [
-        (r"(price\s+increase|price\s+hiked|price\s+went\s+up|costlier)", "price increased after adding to wishlist"),
-        (r"(out\s+of\s+stock|sold\s+out|no\s+stock|item\s+unavailable)", "wishlisted item went out of stock"),
-        (r"(disappear|removed|vanished|missing\s+from\s+wishlist)", "wishlist items randomly disappear or reset"),
-        (r"(limit|cannot\s+add|wishlist\s+full|maximum\s+items)", "wishlist item limit reached"),
-        (r"(hard\s+to\s+find|cannot\s+organize|no\s+folder|no\s+category)", "lack of wishlist organization and categorization"),
-        (r"(no\s+notification|price\s+drop\s+alert|didn't\s+notify)", "lack of timely price drop and restock notifications"),
-        (r"(bookmark|save\s+for\s+later|never\s+buy|just\s+looking)", "used as inspirational bookmarking rather than direct intent"),
-    ]
-
-    # Competitor Mentions
-    COMPETITOR_PATTERNS = [
-        (r"\bajio\b", "AJIO"),
-        (r"\bamazon\b", "Amazon Fashion"),
-        (r"\bflipkart\b", "Flipkart"),
-        (r"\bnykaa\b", "Nykaa Fashion"),
-        (r"\bmeesho\b", "Meesho"),
-        (r"\bzara\b", "Zara"),
-        (r"\bh&m\b", "H&M"),
-    ]
 
     def extract(self, text: str) -> Dict[str, Any]:
-        """Extract structured insights from text using heuristic & NLP matching."""
+        """Extract structured insights from text using cognitive NLP matching."""
         lower_text = text.lower()
 
-        # 1. Uncertainty Types
-        uncertainties = []
-        for utype, patterns in self.UNCERTAINTY_PATTERNS.items():
+        # 1. Failure Point
+        failure_point = "zero_results"
+        for pattern, fp in self.FAILURE_PATTERNS:
+            if re.search(pattern, lower_text):
+                failure_point = fp
+                break
+
+        # 2. Remembered Clues
+        remembered_clues = []
+        for clue, patterns in self.CLUE_PATTERNS.items():
             for p in patterns:
                 if re.search(p, lower_text):
-                    uncertainties.append(utype)
+                    remembered_clues.append(clue)
                     break
+        if not remembered_clues:
+            remembered_clues = ["visual_anchor", "location_vibe"]
 
-        # 2. Shopper Persona
-        detected_persona = "inspiration_browser"
+        # 3. Forgotten Elements
+        forgotten_elements = []
+        for fe, patterns in self.FORGOTTEN_PATTERNS.items():
+            for p in patterns:
+                if re.search(p, lower_text):
+                    forgotten_elements.append(fe)
+                    break
+        if not forgotten_elements:
+            forgotten_elements = ["exact_date", "gps_geotag"]
+
+        # 4. Photo Category
+        detected_category = "episodic_life_event"
+        category_scores = {}
+        for cat, patterns in self.CATEGORY_PATTERNS.items():
+            score = sum(1 for p in patterns if re.search(p, lower_text))
+            if score > 0:
+                category_scores[cat] = score
+        if category_scores:
+            detected_category = max(category_scores, key=category_scores.get)
+
+        # 5. User Persona
+        detected_persona = "life_documenter"
         persona_scores = {}
         for persona, patterns in self.PERSONA_PATTERNS.items():
             score = sum(1 for p in patterns if re.search(p, lower_text))
@@ -78,85 +113,50 @@ class HeuristicExtractor:
         if persona_scores:
             detected_persona = max(persona_scores, key=persona_scores.get)
 
-        # 3. Wishlist Pain Point
-        wishlist_pain = None
-        for pattern, pain_desc in self.WISHLIST_PAIN_PATTERNS:
-            if re.search(pattern, lower_text):
-                wishlist_pain = pain_desc
-                break
+        # 6. Search Query / Behavior
+        search_behavior = "keyword_stacking"
+        if len(text.split()) > 25:
+            search_behavior = "natural_language_story"
+        elif "scroll" in lower_text:
+            search_behavior = "immediate_scroll_fallback"
+        elif "synonym" in lower_text or "tried" in lower_text:
+            search_behavior = "synonym_churning"
 
-        # 4. Price Behavior
-        price_behavior = None
-        if re.search(r"(price\s+increase|price\s+went\s+up|costlier|rate\s+increased)", lower_text):
-            price_behavior = "price increased after wishlisting"
-        elif re.search(r"(wait\s+for\s+sale|wait\s+for\s+discount|price\s+drop|discount\s+wait)", lower_text):
-            price_behavior = "waiting for sale or price drop"
-        elif re.search(r"(coupon\s+not\s+working|convenience\s+fee|platform\s+fee)", lower_text):
-            price_behavior = "hidden fees or platform charges at checkout"
-
-        # 5. Purchase Blocker
-        blocker = None
-        if "fit" in uncertainties and ("size" in lower_text or "chart" in lower_text):
-            blocker = "Size uncertainty and inconsistent brand fit charts"
-        elif "quality" in uncertainties and ("cheap" in lower_text or "fabric" in lower_text or "color" in lower_text):
-            blocker = "Fabric quality doubt and fear product won't match photos"
-        elif "trust" in uncertainties and ("return" in lower_text or "refund" in lower_text or "fee" in lower_text):
-            blocker = "Return friction, non-refundable platform fee, or refund delays"
-        elif wishlist_pain == "wishlisted item went out of stock":
-            blocker = "Product frequently goes out of stock before purchase decision"
-        elif price_behavior == "price increased after wishlisting":
-            blocker = "Sudden price surge after saving item to wishlist"
-        elif price_behavior == "waiting for sale or price drop":
-            blocker = "Waiting for festive discount or upcoming price reduction"
-        elif "availability" in uncertainties:
-            blocker = "Preferred size or variant unavailable"
-        elif len(uncertainties) > 0:
-            blocker = f"Uncertainty regarding {', '.join(uncertainties)}"
-
-        # 6. Feature Request
+        # 7. Feature Request
         feature_request = None
-        if re.search(r"(size\s+recommend|body\s+type|fit\s+finder)", lower_text):
-            feature_request = "Fit predictor / accurate size recommendation tool"
-        elif re.search(r"(price\s+tracker|price\s+alert|notify\s+when\s+price\s+drops)", lower_text):
-            feature_request = "Price drop alert and historical price tracker"
-        elif re.search(r"(organize|folder|category|sub\s*wishlist|collection)", lower_text):
-            feature_request = "Wishlist categorization and custom collection boards"
-        elif re.search(r"(try\s*on|ar\s*view|real\s*photo|customer\s*photo)", lower_text):
-            feature_request = "Customer video reviews and virtual try-on previews"
+        if re.search(r"(ask\s+photos|conversational|ai\s+search|chat|talk)", lower_text):
+            feature_request = "Conversational multi-turn retrieval (Ask Photos)"
+        elif re.search(r"(filter|color|season|vibe|companion)", lower_text):
+            feature_request = "Associative filters for mood, companion, and weather"
+        elif re.search(r"(ocr|read\s+text|handwriting)", lower_text):
+            feature_request = "Enhanced OCR indexing for receipts and handwritten notes"
+        elif re.search(r"(date\s+range|slider|approximate)", lower_text):
+            feature_request = "Fuzzy relative time range search"
 
-        # 7. Competitor Mention
-        competitor_mention = None
-        found_comps = []
-        for pat, comp_name in self.COMPETITOR_PATTERNS:
-            if re.search(pat, lower_text):
-                found_comps.append(comp_name)
-        if found_comps:
-            competitor_mention = f"Compares experience with {', '.join(found_comps)}"
+        # Target description
+        target_description = f"Seeking vaguely remembered {detected_category.replace('_', ' ')}"
+        if "medicine" in lower_text or "pill" in lower_text:
+            target_description = "Medicine or pharmacy tablet strip taken while unwell"
+        elif "cafe" in lower_text or "goa" in lower_text:
+            target_description = "Small cafe breakfast during holiday/vacation trip"
+        elif "receipt" in lower_text or "bill" in lower_text:
+            target_description = "Store receipt or utility document for proof/warranty"
+        elif "screenshot" in lower_text:
+            target_description = "Screenshot of saved book recommendation or article"
 
-        # 8. Wishlist Motivation
-        motivation = None
-        if "occasion" in uncertainties or detected_persona == "occasion_shopper":
-            motivation = "Planning and shortlisting for an upcoming occasion or event"
-        elif detected_persona == "budget_conscious":
-            motivation = "Tracking product prices and saving for discounts/deals"
-        elif detected_persona == "inspiration_browser":
-            motivation = "Saving visual inspiration and bookmarking styles for later"
-        elif "fit" in uncertainties:
-            motivation = "Shortlisting items while verifying measurements and sizing"
-        else:
-            motivation = "Saving appealing fashion products to compare before checkout"
-
-        # 9. Evidence Type
-        evidence_type = "direct_statement" if len(text) > 80 and (blocker or wishlist_pain) else "inference"
+        evidence_type = "direct_statement" if len(text) > 80 else "inference"
 
         return {
-            "wishlist_motivation": motivation,
-            "purchase_blocker": blocker,
-            "uncertainty_type": uncertainties if uncertainties else ["quality"],
-            "shopper_persona": detected_persona,
+            "photo_category": detected_category,
+            "target_photo_description": target_description,
+            "remembered_clues": remembered_clues,
+            "remembered_details": f"Recalls contextual clues: {', '.join(remembered_clues)}",
+            "forgotten_elements": forgotten_elements,
+            "search_query_attempted": "vague keyword attempt",
+            "search_behavior": search_behavior,
+            "retrieval_failure_point": failure_point,
+            "user_frustration_detail": f"Retrieval failed due to {failure_point.replace('_', ' ')}",
+            "user_persona": detected_persona,
             "evidence_type": evidence_type,
-            "wishlist_pain_point": wishlist_pain,
-            "price_behavior": price_behavior,
             "feature_request": feature_request,
-            "competitor_mention": competitor_mention,
         }

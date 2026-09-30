@@ -1,8 +1,8 @@
 """
-Storage Layer — Database Interface for Myntra Discovery Engine
+Storage Layer — Database Interface for Google Photos Discovery Engine
 
 SQLite database interface with schema management, indexing,
-and CRUD operations for raw documents, extractions, tags, and aggregated patterns.
+and CRUD operations for raw documents, cognitive extractions, tags, and aggregated retrieval patterns.
 """
 
 import json
@@ -14,7 +14,7 @@ from config.settings import DB_PATH
 
 
 class Database:
-    """SQLite database interface for the discovery engine."""
+    """SQLite database interface for the Google Photos discovery engine."""
 
     def __init__(self, db_path: Optional[str] = None):
         self.db_path = db_path or str(DB_PATH)
@@ -47,12 +47,19 @@ class Database:
                 doc_id TEXT NOT NULL,
                 segment_index INTEGER DEFAULT 0,
                 segment_text TEXT,
-                wishlist_motivation TEXT,
-                purchase_blocker TEXT,
-                uncertainty_types TEXT,  -- JSON array
-                shopper_persona TEXT,
+                photo_category TEXT,
+                target_photo_description TEXT,
+                remembered_clues TEXT,       -- JSON array
+                remembered_details TEXT,
+                forgotten_elements TEXT,     -- JSON array
+                search_query_attempted TEXT,
+                search_behavior TEXT,
+                retrieval_failure_point TEXT,
+                user_frustration_detail TEXT,
+                user_persona TEXT,
                 evidence_type TEXT,
                 confidence_score REAL,
+                feature_request TEXT,
                 llm_model TEXT,
                 raw_response TEXT,
                 analyzed_at TEXT NOT NULL,
@@ -69,7 +76,7 @@ class Database:
 
             CREATE TABLE IF NOT EXISTS aggregated_patterns (
                 pattern_id TEXT PRIMARY KEY,
-                blocker_tag TEXT NOT NULL,
+                failure_tag TEXT NOT NULL,
                 occurrence_count INTEGER,
                 weighted_count REAL,
                 avg_confidence REAL,
@@ -78,23 +85,12 @@ class Database:
                 last_updated TEXT NOT NULL
             );
 
-            CREATE INDEX IF NOT EXISTS idx_extractions_doc_id
-                ON extractions(doc_id);
-            CREATE INDEX IF NOT EXISTS idx_tags_extraction_id
-                ON tags(extraction_id);
-            CREATE INDEX IF NOT EXISTS idx_extractions_blocker
-                ON extractions(purchase_blocker);
-            CREATE INDEX IF NOT EXISTS idx_extractions_persona
-                ON extractions(shopper_persona);
+            CREATE INDEX IF NOT EXISTS idx_extractions_doc_id ON extractions(doc_id);
+            CREATE INDEX IF NOT EXISTS idx_tags_extraction_id ON tags(extraction_id);
+            CREATE INDEX IF NOT EXISTS idx_extractions_failure ON extractions(retrieval_failure_point);
+            CREATE INDEX IF NOT EXISTS idx_extractions_persona ON extractions(user_persona);
+            CREATE INDEX IF NOT EXISTS idx_extractions_category ON extractions(photo_category);
         """)
-        conn.commit()
-
-        # Migrate: add new wishlist-research columns if they don't exist
-        for col in ["wishlist_pain_point", "price_behavior", "feature_request", "competitor_mention"]:
-            try:
-                conn.execute(f"ALTER TABLE extractions ADD COLUMN {col} TEXT")
-            except sqlite3.OperationalError:
-                pass  # Column already exists
         conn.commit()
         conn.close()
 
@@ -105,6 +101,7 @@ class Database:
         """Insert normalized raw documents into SQLite, ignoring duplicates."""
         conn = self._get_conn()
         for doc in documents:
+            text = doc.get("text_content") or doc.get("text", "")
             conn.execute("""
                 INSERT OR IGNORE INTO raw_documents
                 (doc_id, source, source_id, author_hash,
@@ -115,7 +112,7 @@ class Database:
                 doc["source"],
                 doc["source_id"],
                 doc.get("author_hash"),
-                doc["text"],
+                text,
                 doc.get("timestamp"),
                 json.dumps(doc.get("metadata", {})),
                 doc["ingested_at"],
@@ -133,7 +130,7 @@ class Database:
         return [dict(r) for r in rows]
 
     def get_unanalyzed_documents(self, limit: int = 100) -> List[Dict[str, Any]]:
-        """Get documents that have not been processed by the LLM extraction pipeline."""
+        """Get documents that have not been processed by the extraction pipeline."""
         conn = self._get_conn()
         rows = conn.execute("""
             SELECT rd.* FROM raw_documents rd
@@ -149,32 +146,50 @@ class Database:
     # ──────────────────────────────────────────────
     def insert_extraction(self, extraction: Dict[str, Any]):
         conn = self._get_conn()
+        rem_clues = extraction.get("remembered_clues", [])
+        if isinstance(rem_clues, list):
+            rem_clues_json = json.dumps(rem_clues)
+        else:
+            rem_clues_json = json.dumps([rem_clues] if rem_clues else [])
+
+        forg_elem = extraction.get("forgotten_elements", [])
+        if isinstance(forg_elem, list):
+            forg_elem_json = json.dumps(forg_elem)
+        else:
+            forg_elem_json = json.dumps([forg_elem] if forg_elem else [])
+
         conn.execute("""
             INSERT OR REPLACE INTO extractions
             (extraction_id, doc_id, segment_index, segment_text,
-             wishlist_motivation, purchase_blocker, uncertainty_types,
-             shopper_persona, evidence_type, confidence_score,
-             llm_model, raw_response, analyzed_at,
-             wishlist_pain_point, price_behavior, feature_request, competitor_mention)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+             photo_category, target_photo_description,
+             remembered_clues, remembered_details,
+             forgotten_elements, search_query_attempted,
+             search_behavior, retrieval_failure_point,
+             user_frustration_detail, user_persona,
+             evidence_type, confidence_score, feature_request,
+             llm_model, raw_response, analyzed_at)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         """, (
             extraction["extraction_id"],
             extraction["doc_id"],
             extraction.get("segment_index", 0),
             extraction.get("segment_text"),
-            extraction.get("wishlist_motivation"),
-            extraction.get("purchase_blocker"),
-            json.dumps(extraction.get("uncertainty_types", [])),
-            extraction.get("shopper_persona"),
+            extraction.get("photo_category"),
+            extraction.get("target_photo_description"),
+            rem_clues_json,
+            extraction.get("remembered_details"),
+            forg_elem_json,
+            extraction.get("search_query_attempted"),
+            extraction.get("search_behavior"),
+            extraction.get("retrieval_failure_point"),
+            extraction.get("user_frustration_detail"),
+            extraction.get("user_persona"),
             extraction.get("evidence_type"),
             extraction.get("confidence_score"),
+            extraction.get("feature_request"),
             extraction.get("llm_model"),
             extraction.get("raw_response"),
             extraction["analyzed_at"],
-            extraction.get("wishlist_pain_point"),
-            extraction.get("price_behavior"),
-            extraction.get("feature_request"),
-            extraction.get("competitor_mention"),
         ))
         conn.commit()
         conn.close()
@@ -191,13 +206,13 @@ class Database:
                         INSERT OR IGNORE INTO tags
                         (tag_id, extraction_id, tag_category, tag_value)
                         VALUES (?, ?, ?, ?)
-                    """, (str(uuid.uuid4()), extraction_id, category, v))
+                    """, (str(uuid.uuid4()), extraction_id, category, str(v)))
             elif value:
                 conn.execute("""
                     INSERT OR IGNORE INTO tags
                     (tag_id, extraction_id, tag_category, tag_value)
                     VALUES (?, ?, ?, ?)
-                """, (str(uuid.uuid4()), extraction_id, category, value))
+                """, (str(uuid.uuid4()), extraction_id, category, str(value)))
         conn.commit()
         conn.close()
 
@@ -206,17 +221,18 @@ class Database:
     # ──────────────────────────────────────────────
     def save_aggregated_patterns(self, patterns: List[Dict[str, Any]]):
         conn = self._get_conn()
-        conn.execute("DELETE FROM aggregated_patterns")  # Replace all
+        conn.execute("DELETE FROM aggregated_patterns")
         for p in patterns:
+            tag = p.get("failure_tag") or p.get("blocker_tag", "unknown")
             conn.execute("""
                 INSERT INTO aggregated_patterns
-                (pattern_id, blocker_tag, occurrence_count, weighted_count,
+                (pattern_id, failure_tag, occurrence_count, weighted_count,
                  avg_confidence, persona_distribution, sample_doc_ids,
                  last_updated)
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?)
             """, (
                 str(uuid.uuid4()),
-                p["blocker_tag"],
+                tag,
                 p["occurrence_count"],
                 p["weighted_count"],
                 p["avg_confidence"],
@@ -228,7 +244,7 @@ class Database:
         conn.close()
 
     # ──────────────────────────────────────────────
-    # Query Helpers (for Dashboard API & Analysis)
+    # Query Helpers for Dashboard API & Reporting
     # ──────────────────────────────────────────────
     def get_overview_stats(self) -> Dict[str, Any]:
         conn = self._get_conn()
@@ -245,58 +261,101 @@ class Database:
             "sources": sources,
         }
 
-    def get_top_blockers(self, limit: int = 10) -> List[Dict[str, Any]]:
+    def get_top_failure_points(self, limit: int = 10) -> List[Dict[str, Any]]:
         conn = self._get_conn()
         rows = conn.execute("""
-            SELECT blocker_tag, occurrence_count, weighted_count,
+            SELECT failure_tag, occurrence_count, weighted_count,
                    avg_confidence, persona_distribution, sample_doc_ids
             FROM aggregated_patterns
             ORDER BY weighted_count DESC
             LIMIT ?
         """, (limit,)).fetchall()
         conn.close()
+        if not rows:
+            # Fallback directly to extractions table if aggregated_patterns hasn't been run
+            conn = self._get_conn()
+            fallback_rows = conn.execute("""
+                SELECT retrieval_failure_point as failure_tag, COUNT(*) as occurrence_count,
+                       ROUND(SUM(confidence_score), 2) as weighted_count,
+                       ROUND(AVG(confidence_score), 3) as avg_confidence
+                FROM extractions
+                WHERE retrieval_failure_point IS NOT NULL
+                GROUP BY retrieval_failure_point
+                ORDER BY weighted_count DESC
+                LIMIT ?
+            """, (limit,)).fetchall()
+            conn.close()
+            return [dict(r) for r in fallback_rows]
         return [dict(r) for r in rows]
 
-    def get_extractions_by_blocker(self, blocker_tag: str) -> List[Dict[str, Any]]:
+    # Backward compatibility alias
+    def get_top_blockers(self, limit: int = 10) -> List[Dict[str, Any]]:
+        return self.get_top_failure_points(limit=limit)
+
+    def get_remembered_clues_stats(self) -> Dict[str, int]:
+        conn = self._get_conn()
+        rows = conn.execute("SELECT remembered_clues FROM extractions WHERE remembered_clues IS NOT NULL").fetchall()
+        conn.close()
+        counts: Dict[str, int] = {}
+        for r in rows:
+            try:
+                clues = json.loads(r[0])
+                for c in clues:
+                    counts[c] = counts.get(c, 0) + 1
+            except Exception:
+                pass
+        return dict(sorted(counts.items(), key=lambda x: x[1], reverse=True))
+
+    def get_forgotten_elements_stats(self) -> Dict[str, int]:
+        conn = self._get_conn()
+        rows = conn.execute("SELECT forgotten_elements FROM extractions WHERE forgotten_elements IS NOT NULL").fetchall()
+        conn.close()
+        counts: Dict[str, int] = {}
+        for r in rows:
+            try:
+                elem = json.loads(r[0])
+                for e in elem:
+                    counts[e] = counts.get(e, 0) + 1
+            except Exception:
+                pass
+        return dict(sorted(counts.items(), key=lambda x: x[1], reverse=True))
+
+    def get_photo_categories_stats(self) -> Dict[str, int]:
         conn = self._get_conn()
         rows = conn.execute("""
-            SELECT e.*, rd.source, rd.metadata
-            FROM extractions e
-            JOIN raw_documents rd ON e.doc_id = rd.doc_id
-            JOIN tags t ON e.extraction_id = t.extraction_id
-            WHERE t.tag_category = 'purchase_blocker_tag'
-              AND t.tag_value = ?
-            ORDER BY e.confidence_score DESC
-        """, (blocker_tag,)).fetchall()
+            SELECT photo_category, COUNT(*) as count
+            FROM extractions
+            WHERE photo_category IS NOT NULL
+            GROUP BY photo_category
+            ORDER BY count DESC
+        """).fetchall()
         conn.close()
-        return [dict(r) for r in rows]
+        return {r[0]: r[1] for r in rows}
+
+    def get_search_behavior_stats(self) -> Dict[str, int]:
+        conn = self._get_conn()
+        rows = conn.execute("""
+            SELECT search_behavior, COUNT(*) as count
+            FROM extractions
+            WHERE search_behavior IS NOT NULL
+            GROUP BY search_behavior
+            ORDER BY count DESC
+        """).fetchall()
+        conn.close()
+        return {r[0]: r[1] for r in rows}
 
     def get_persona_stats(self) -> List[Dict[str, Any]]:
         conn = self._get_conn()
         rows = conn.execute("""
-            SELECT shopper_persona, COUNT(*) as count,
-                   AVG(confidence_score) as avg_conf
+            SELECT user_persona, COUNT(*) as count,
+                   ROUND(AVG(confidence_score), 3) as avg_conf
             FROM extractions
-            WHERE shopper_persona IS NOT NULL AND shopper_persona != 'Unknown'
-            GROUP BY shopper_persona
+            WHERE user_persona IS NOT NULL AND user_persona != 'Unknown'
+            GROUP BY user_persona
             ORDER BY count DESC
         """).fetchall()
         conn.close()
         return [dict(r) for r in rows]
-
-    def get_uncertainty_stats(self) -> Dict[str, int]:
-        conn = self._get_conn()
-        rows = conn.execute("SELECT uncertainty_types FROM extractions WHERE uncertainty_types IS NOT NULL").fetchall()
-        conn.close()
-        counts = {}
-        for r in rows:
-            try:
-                utypes = json.loads(r[0])
-                for u in utypes:
-                    counts[u] = counts.get(u, 0) + 1
-            except Exception:
-                pass
-        return dict(sorted(counts.items(), key=lambda x: x[1], reverse=True))
 
     def get_confidence_distribution(self) -> Dict[str, int]:
         conn = self._get_conn()
@@ -317,9 +376,12 @@ class Database:
         self,
         limit: int = 50,
         offset: int = 0,
-        blocker: Optional[str] = None,
+        failure_point: Optional[str] = None,
         persona: Optional[str] = None,
+        category: Optional[str] = None,
         search: Optional[str] = None,
+        # backward compatibility
+        blocker: Optional[str] = None,
     ) -> List[Dict[str, Any]]:
         conn = self._get_conn()
         query = """
@@ -329,14 +391,18 @@ class Database:
             WHERE 1=1
         """
         params = []
-        if blocker:
-            query += " AND e.purchase_blocker LIKE ?"
-            params.append(f"%{blocker}%")
+        target_failure = failure_point or blocker
+        if target_failure:
+            query += " AND e.retrieval_failure_point LIKE ?"
+            params.append(f"%{target_failure}%")
         if persona:
-            query += " AND e.shopper_persona = ?"
+            query += " AND e.user_persona = ?"
             params.append(persona)
+        if category:
+            query += " AND e.photo_category = ?"
+            params.append(category)
         if search:
-            query += " AND (e.segment_text LIKE ? OR e.purchase_blocker LIKE ? OR e.wishlist_motivation LIKE ?)"
+            query += " AND (e.segment_text LIKE ? OR e.target_photo_description LIKE ? OR e.user_frustration_detail LIKE ?)"
             params.extend([f"%{search}%", f"%{search}%", f"%{search}%"])
 
         query += " ORDER BY e.confidence_score DESC LIMIT ? OFFSET ?"
@@ -348,9 +414,13 @@ class Database:
         for r in rows:
             d = dict(r)
             try:
-                d["uncertainty_types"] = json.loads(d.get("uncertainty_types") or "[]")
+                d["remembered_clues"] = json.loads(d.get("remembered_clues") or "[]")
             except Exception:
-                d["uncertainty_types"] = []
+                d["remembered_clues"] = []
+            try:
+                d["forgotten_elements"] = json.loads(d.get("forgotten_elements") or "[]")
+            except Exception:
+                d["forgotten_elements"] = []
             try:
                 d["metadata"] = json.loads(d.get("metadata") or "{}")
             except Exception:

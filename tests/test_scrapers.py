@@ -27,7 +27,7 @@ class TestGooglePlayScraper:
         gp = GooglePlayScraper()
         assert isinstance(gp, BaseScraper)
         assert gp.source_name == "google_play"
-        assert gp.APP_ID == "com.myntra.android"
+        assert gp.APP_ID == "com.google.android.apps.photos"
 
     def test_to_document_creates_valid_schema(self):
         gp = GooglePlayScraper()
@@ -53,8 +53,21 @@ class TestGooglePlayScraper:
         assert doc["metadata"]["thumbs_up"] == 15
         assert "scraped_at" in doc
 
-    def test_scrape_returns_list(self):
-        """Live scrape of 3 reviews to verify structure (minimal API hit)."""
+    @patch("ingestion.scrapers.google_play_scraper.reviews")
+    def test_scrape_returns_list(self, mock_reviews):
+        """Scrape returns parsed list of RawDocuments."""
+        from datetime import datetime
+        mock_reviews.return_value = ([
+            {
+                "reviewId": "gp-test-1",
+                "content": "Cannot find my photos from last summer trip.",
+                "score": 2,
+                "thumbsUpCount": 4,
+                "userName": "PhotoUser",
+                "at": datetime(2026, 8, 1),
+                "reviewCreatedVersion": "6.80.0",
+            }
+        ], None)
         gp = GooglePlayScraper()
         docs = gp.scrape(count=3)
 
@@ -82,7 +95,7 @@ class TestAppStoreScraper:
         app_store = AppStoreScraper()
         assert isinstance(app_store, BaseScraper)
         assert app_store.source_name == "app_store"
-        assert app_store.APP_ID == "907394059"
+        assert app_store.APP_ID == "962194608"
 
     def test_to_document_creates_valid_schema(self):
         app_store = AppStoreScraper()
@@ -196,7 +209,7 @@ class TestApifyAppStoreScraper:
         scraper = ApifyAppStoreScraper()
         assert isinstance(scraper, BaseScraper)
         assert scraper.source_name == "app_store_apify"
-        assert scraper.APP_ID == "907394059"
+        assert scraper.APP_ID == "962194608"
 
     def test_to_document_creates_valid_schema(self):
         scraper = ApifyAppStoreScraper()

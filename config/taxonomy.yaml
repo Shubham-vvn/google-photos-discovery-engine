@@ -1,47 +1,58 @@
 # ============================================================
-# Myntra Discovery Engine — Canonical Taxonomy
+# Google Photos Discovery Engine — Cognitive Retrieval Taxonomy
 # ============================================================
-# This taxonomy is a LIVING DOCUMENT. It starts with educated
-# categories but is designed to grow as new patterns emerge
-# from real user data. When the classifier finds extractions
-# that don't map to any existing tag, they are flagged as
-# "emerging patterns" for human review.
+# Canonical taxonomy classifying how users recall visual memories,
+# what clues they retain vs forget, and where search fails.
 # ============================================================
 
-# Why users DON'T complete the purchase after wishlisting
-purchase_blockers:
-  - fit_uncertainty          # "not sure if it will fit"
-  - size_uncertainty         # "size chart seems off"
-  - quality_doubt            # "quality looks questionable"
-  - color_mismatch_fear      # "worried color won't match photos"
-  - price_not_justified      # "too expensive for what it is"
-  - occasion_mismatch        # "not sure if it suits the occasion"
-  - waiting_for_sale         # "waiting for price drop" (tracked, not solved with discounts)
-  - need_external_opinion    # "need to ask friend/family first"
-  - forgotten_wishlist       # "forgot I had it wishlisted"
-  - mood_board_usage         # "just saving for inspiration, not buying"
-  - trust_in_reviews         # "reviews seem fake/unreliable"
-  - stock_availability       # "my size/color not available"
-  - delivery_uncertainty     # "not sure about delivery timeline"
-  - return_policy_concern    # "worried about return/exchange hassle"
+# 1. Retrieval Failure Points (Where search experience collapses)
+retrieval_failure_points:
+  - zero_results                 # Search returns 0 hits despite photo existing in library
+  - overwhelming_results         # Returns 500+ unranked photos causing cognitive overload
+  - semantic_misunderstanding    # Fails to understand context or takes keywords too literally
+  - ocr_text_mismatch            # Blurry/unindexed text in receipts, documents, or screenshots
+  - temporal_disconnect          # Fails on vague temporal phrases ("last monsoon", "college days")
+  - synonym_blindness            # Misses obvious conceptual synonyms ("medicine" vs "tablet")
+  - scroll_fatigue_abandonment   # User gives up searching and abandons after endless scrolling
+  - false_positive_clutter       # Flooded with unrelated screenshots or memes
 
-# What kind of doubt or hesitation the user expresses
-uncertainty_types:
-  - fit                      # Will it fit my body?
-  - quality                  # Is the material/build good?
-  - price                    # Is it worth the money?
-  - occasion                 # Is it right for the event?
-  - trust                    # Can I trust the reviews/seller?
-  - availability             # Will it be in stock?
-  - durability               # Will it last?
-  - styling                  # Will it look good on me?
+# 2. What Information Users Actually Remember (Cognitive Clues)
+remembered_clues:
+  - visual_anchor                # Prominent colors, shapes, objects ("white pills", "blue door")
+  - social_companion             # People present ("with mom", "Rohan in the frame")
+  - location_vibe                # Setting ambiance ("beachside café", "hotel rooftop pool")
+  - emotional_context            # Mood/circumstance ("when I was sick", "first day of work")
+  - temporal_approximation       # Relative timeframes ("last winter", "two years ago around Diwali")
+  - activity_context             # What was happening ("cooking dinner", "hiking trail", "packing bags")
 
-# What type of shopper this person appears to be
-shopper_personas:
-  - budget_conscious         # Price-sensitive, compares deals
-  - occasion_shopper         # Buys for specific events (wedding, festival)
-  - inspiration_browser      # Browses for ideas, may not intend to buy
-  - brand_loyal              # Sticks to specific brands
-  - trend_follower           # Buys trending/viral items
-  - gifter                   # Shopping for someone else
-  - impulse_saver            # Adds to wishlist on impulse, rarely buys
+# 3. What Information Users Have Forgotten
+forgotten_elements:
+  - exact_date                   # Specific calendar date or exact month
+  - gps_geotag                   # Exact GPS location, city, or venue name
+  - album_folder_name            # Which folder or album it was filed under
+  - exact_text_content           # Specific spelling or words on the receipt or screen
+  - camera_device_metadata       # Device model, camera app, or WhatsApp backup status
+
+# 4. Photo Intent Categories (What users are trying to retrieve)
+photo_categories:
+  - episodic_life_event          # Vacations, celebrations, casual outings, milestone events
+  - visual_utility_document      # Medical prescriptions, store receipts, serial numbers, tickets
+  - screenshot_saved_media       # Book recommendations, recipes, fashion looks, articles
+  - people_and_portraits         # Kids growing up, pets, deceased relatives, group photos
+  - aesthetic_and_inspiration    # Sunset views, interior designs, art, architecture
+
+# 5. How Users Formulate Incomplete Memory Searches
+search_behaviors:
+  - keyword_stacking             # Typing fragmented keywords ("Goa café breakfast sea")
+  - natural_language_story       # Typing descriptive sentences ("that café we went to in Goa")
+  - synonym_churning             # Bashing synonyms ("medicine" -> "pills" -> "tablets")
+  - immediate_scroll_fallback    # Giving up on search immediately and scrolling for 20 minutes
+  - album_hunting                # Checking multiple default albums before searching
+
+# 6. Target User Personas
+user_personas:
+  - life_documenter              # 25,000+ photos, photographs everyday life, heavy timeline clutter
+  - visual_note_taker            # Uses camera as a notebook for bills, receipts, whiteboard notes
+  - nostalgia_seeker             # Searches archives for emotional past moments and life chapters
+  - screenshot_curator           # Saves visual recommendations, memes, and articles constantly
+  - family_archivist             # Tracks family moments, children milestones, and family records

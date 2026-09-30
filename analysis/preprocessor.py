@@ -1,7 +1,7 @@
 """
 Preprocessor
 
-Filters irrelevant reviews (app bugs, crash reports) and segments
+Filters irrelevant reviews (billing complaints, account lockouts) and segments
 long text into LLM-friendly chunks for extraction.
 """
 
@@ -10,32 +10,28 @@ from typing import Any, Dict, List
 
 
 class Preprocessor:
-    """Filters irrelevant content and segments text for analysis."""
+    """Filters irrelevant content and segments text for cognitive retrieval analysis."""
 
-    # Keywords indicating shopping/purchase behavior
+    # Keywords indicating photo search, memory retrieval, and browsing behavior
     RELEVANCE_KEYWORDS = [
-        "wishlist", "wish list", "saved", "save for later", "cart",
-        "buy", "bought", "purchase", "order", "didn't order",
-        "waiting", "confused", "not sure", "thinking about",
-        "size", "fit", "quality", "worth", "expensive", "cheap",
-        "return", "exchange", "review", "rating", "trust",
-        "wedding", "occasion", "festival", "party",
-        "compare", "similar", "alternative", "option",
-        "like", "love", "want", "need", "browse",
-        "app", "myntra", "fashion", "clothes", "dress", "shoe",
-        "delivery", "refund", "color", "fabric", "material",
-        "price", "discount", "sale", "offer", "coupon",
+        "search", "find", "can't find", "cant find", "remember", "forgot",
+        "photo", "picture", "image", "video", "album", "scroll", "scrolling",
+        "receipt", "screenshot", "medicine", "cafe", "vacation", "trip",
+        "query", "face", "tag", "location", "date", "year", "old photo",
+        "lost", "disappeared", "looking for", "retrieval", "timeline",
+        "years ago", "months ago", "event", "document", "ask photos",
+        "results", "zero results", "too many photos", "impossible to find"
     ]
 
-    # Keywords for clearly irrelevant content (app tech issues)
+    # Keywords for clearly irrelevant content (billing/subscription spam)
     IRRELEVANT_KEYWORDS = [
-        "crash", "bug", "error", "loading", "slow app",
-        "update", "install", "uninstall", "permission",
-        "notification spam", "ads", "otp", "login fail",
+        "subscription charge", "google one bill", "payment failed",
+        "refund money", "credit card declined", "storage plan price",
+        "otp login", "hacked account"
     ]
 
     def filter_relevant(self, documents: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
-        """Keep only documents related to shopping behavior."""
+        """Keep only documents related to photo search and retrieval behavior."""
         return [
             doc for doc in documents
             if self._is_relevant(doc.get("text_content", doc.get("text", "")))
@@ -49,7 +45,7 @@ class Preprocessor:
         )
         if irrelevant_count >= 2:
             return False
-        # Include if has shopping-related keywords
+        # Include if has photo search / memory retrieval keywords
         relevant_count = sum(
             1 for kw in self.RELEVANCE_KEYWORDS if kw in text_lower
         )
@@ -60,13 +56,14 @@ class Preprocessor:
         if len(text) <= max_chars:
             return [text]
 
+        # Split on sentence boundaries
         sentences = re.split(r'(?<=[.!?])\s+', text)
         segments = []
         current = ""
 
         for sentence in sentences:
-            if len(current) + len(sentence) < max_chars:
-                current += (" " if current else "") + sentence
+            if len(current) + len(sentence) + 1 <= max_chars:
+                current = f"{current} {sentence}".strip()
             else:
                 if current:
                     segments.append(current)
@@ -75,4 +72,4 @@ class Preprocessor:
         if current:
             segments.append(current)
 
-        return segments if segments else [text[:max_chars]]
+        return segments if segments else [text]

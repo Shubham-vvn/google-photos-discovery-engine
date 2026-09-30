@@ -1,33 +1,59 @@
-# 🛍️ Myntra Wishlist-to-Purchase AI Discovery Engine
+# 📸 Google Photos AI Discovery Engine & Retrieval MVP
 
-> **An AI-powered discovery engine that uncovers why Myntra shoppers wishlist items but don't complete the purchase — discovered from real customer voice and behavioral language, with strictly ₹0 infrastructure cost and non-monetary solutions.**
-
----
-
-## 🎯 The Core Problem & Philosophy
-
-- **The Problem:** Across fashion eCommerce, millions of items are saved to wishlists daily, yet the conversion rate from wishlist to checkout remains low.
-- **The Golden Rule:** *Whatever explains the drop-off between wishlisting and buying, the fix has to work through information, trust, confidence, or experience — **NOT price or monetary discounts**.*
-- **Zero Assumption:** We do not guess customer hesitation upfront; it is derived and extracted from real public user reviews, Reddit discussions (`r/indianfashionadvice`, `r/india`), and Play Store feedback.
+> **NextLeap Product Management Fellowship Graduation Project (Core Experience Team — Google Photos)**
+>
+> An AI-powered discovery engine and interactive retrieval prototype uncovering why Google Photos users struggle to find vaguely remembered photos, transforming unstructured customer voice into actionable PM insights and demonstrating an AI-native associative memory search engine — with strictly **₹0 infrastructure cost**.
 
 ---
 
-## 🏗️ 4-Layer Architecture (₹0 Free Tier Stack)
+## 🎯 The Core Problem: The Cognitive Retrieval Gap
+
+Google Photos users store thousands of photos and videos. When attempting to retrieve a specific past memory, users experience severe friction:
+
+- **Episodic Human Memory vs. Algorithmic Rigidity:** Humans remember photos through sensory, situational, and emotional associations:
+  > *"that rainy afternoon cafe in Goa where we had breakfast with Rohan and sat on blue chairs"*
+- **Current Retrieval Bottleneck:** Traditional search engines rely on strict keyword tags, optical character recognition (OCR), or exact timestamps. When queries miss exact metadata, users encounter:
+  1. `zero_results` (false negatives despite the photo existing)
+  2. `overwhelming_results` (thousands of unranked photos requiring endless scrolling)
+  3. `semantic_misunderstanding` (literal interpretation of figurative or contextual words)
+  4. `ocr_text_mismatch` (over-indexing on random background signs instead of subject)
+  5. `temporal_disconnect` (user recalls season or event; system requires exact calendar date)
+  6. `synonym_blindness` (failing to bridge "beach shack" with "seaside bistro")
+  7. `scroll_fatigue_abandonment` (user drops off after scrolling through 50+ photos)
+
+---
+
+## 📊 Business Metric Decomposition
+
+$$\text{Search Success Index} = Q_f \times S_m \times C_d \times R_e$$
+
+| Component | Metric Definition | Target Impact |
+|---|---|---|
+| **$Q_f$ (Query Formulation Rate)** | % of active users attempting a natural memory search monthly | $+18\%$ via intuitive conversational prompting |
+| **$S_m$ (Semantic Match Rate)** | % of queries returning candidate photos in top 5 results | $+34\%$ through multi-modal associative clue expansion |
+| **$C_d$ (Cognitive Disconnect Rate)** | % of searches ending in zero results or immediate abandonment | $-45\%$ via fuzzy semantic tolerance & synonym graphs |
+| **$R_e$ (Retrieval Efficiency / TTFR)** | Mean time-to-first-relevant-result & scroll depth before selection | Reduced from $42\text{s} \to 9\text{s}$ |
+
+---
+
+## 🏗️ 4-Layer Architecture + Part 5 Retrieval MVP (₹0 Stack)
 
 ```mermaid
 graph TD
-    A[Public Review Data: Google Play / Apple App Store / Reddit] --> B[Layer 1: Ingestion & Normalization]
-    B --> C[Layer 2: AI Analysis Engine: Gemini + Local Embeddings]
-    C --> D[Layer 3: SQLite Storage & Pattern Aggregator]
-    D --> E[Layer 4: Interactive Discovery Dashboard: FastAPI + Modern UI]
+    A[Public Customer Voice: Google Play / iOS App Store / Reddit / Forums] --> B[Layer 1: Ingestion & Normalization]
+    B --> C[Layer 2: AI Cognitive Analysis Engine: Gemini Flash + Local Heuristics]
+    C --> D[Layer 3: SQLite Storage & Cognitive Aggregator]
+    D --> E[Layer 4: Interactive PM Discovery Dashboard: FastAPI + Modern Glassmorphism UI]
+    D --> F[Part 5: AI-Native Retrieval MVP Prototype: Multi-Modal Associative Search Engine]
 ```
 
 | Layer | Component | Technology | Cost |
 |---|---|---|---|
-| **Layer 1: Ingestion** | Scrapers & Cleaners | `google-play-scraper`, Apple App Store RSS JSON, `praw`, Apify Reddit, MinHash LSH Deduplication | ₹0 |
-| **Layer 2: AI Analysis** | LLM & Classification | `gemini-3.5-flash-lite` (Free Tier) + `all-MiniLM-L6-v2` (Local CPU) | ₹0 |
-| **Layer 3: Storage** | Database & Indexes | SQLite 3 (WAL Mode) with composite indexing | ₹0 |
-| **Layer 4: Dashboard** | UI & REST API | FastAPI, Uvicorn, Chart.js, Vanilla CSS Glassmorphism | ₹0 |
+| **Layer 1: Ingestion** | Scrapers & Cleaners | `google-play-scraper` (`com.google.android.apps.photos`), App Store RSS (`962194608`), Reddit PRAW & Apify (`r/googlephotos`, `r/google`, `r/Android`, `r/techsupport`) | ₹0 |
+| **Layer 2: AI Analysis** | Cognitive Extraction & Classifier | Gemini 2.5 Flash / Flash Lite + Offline NLP Fallback + Confidence Scorer | ₹0 |
+| **Layer 3: Storage** | Database & Indexes | SQLite 3 (WAL Mode) with composite indexing on cognitive tags | ₹0 |
+| **Layer 4: Dashboard** | PM Intelligence UI | FastAPI, Jinja2, Chart.js, Vanilla CSS Glassmorphism | ₹0 |
+| **Part 5: Retrieval MVP** | Associative Memory Prototype | FastAPI `/api/retrieval-mvp/search`, Clue Extraction Engine, Interactive Sandbox | ₹0 |
 
 ---
 
@@ -35,8 +61,8 @@ graph TD
 
 ### 1. Clone & Setup
 ```bash
-git clone <repo-url>
-cd Myntra-discovery-engine
+git clone https://github.com/Shubham-vvn/google-photos-discovery-engine.git
+cd google-photos-discovery-engine
 
 # Create and activate virtual environment
 python3 -m venv venv
@@ -51,182 +77,137 @@ pip install -r requirements.txt
 cp .env.example .env
 ```
 Edit `.env` and add your **free** API keys:
+- `GEMINI_API_KEY`: Free from [Google AI Studio](https://aistudio.google.com)
+- `APIFY_API_TOKEN`: Optional (free tier)
+- `REDDIT_CLIENT_ID` / `REDDIT_CLIENT_SECRET`: Optional (for Reddit PRAW scraper)
 
-| Key | Where to Get It | Required? |
-|---|---|---|
-| `GEMINI_API_KEY` | [Google AI Studio](https://aistudio.google.com) | ✅ Yes |
-| `REDDIT_CLIENT_ID` / `SECRET` | [Reddit Apps](https://reddit.com/prefs/apps) | Optional (for PRAW) |
-| `APIFY_API_TOKEN` | [Apify Console](https://console.apify.com/account/integrations) | Optional (free $5/mo) |
-
-### 3. Run Ingestion Pipeline
+### 3. Seed Database & Run Analysis
+The project comes pre-seeded with 300 realistic Google Photos customer voice records across Google Play, Apple App Store, and Reddit:
 ```bash
-# Scrape Google Play (100) and Apple App Store (100) reviews (~30 seconds)
-python scripts/run_ingestion.py --gp-count 100 --app-store-count 100
-
-# Scrape Apple App Store reviews only (RSS)
-python scripts/run_ingestion.py --skip-gp --skip-reddit --app-store-count 100
-
-# Scrape Apple App Store wishlisting reviews via Apify Actor (Deep Historical)
-python scripts/run_ingestion.py --skip-gp --skip-reddit --skip-app-store --apify-app-store --apify-app-store-count 500
-
-# Optional: also scrape Reddit via Apify (5 posts to save credits)
-python scripts/run_ingestion.py --apify --apify-count 5
-```
-
-### 4. Run AI Analysis Pipeline
-```bash
-# Extract blockers, classify uncertainties, score confidence
-python scripts/run_analysis.py --limit 50
-```
-
-### 5. Launch Dashboard
-```bash
-python scripts/run_dashboard.py --port 8000
-```
-Open **[http://127.0.0.1:8000](http://127.0.0.1:8000)** in your browser!
-
-### 6. Seed with Demo Data (Optional)
-```bash
-# Populate the database with realistic mock data for demos
+# Seed synthetic + real customer voice documents
 python scripts/seed_db.py
+
+# Run ingestion (live scrapers)
+python scripts/run_ingestion.py --source google_play --limit 100
+
+# Run cognitive extraction pipeline
+python scripts/run_analysis.py
 ```
 
----
-
-## 📊 Key Discovered Purchase Blockers
-
-From real customer reviews analyzed by the engine:
-
-1. **`delivery_uncertainty` (Confidence: 85%)**
-   - *Customer Quote:* *"Ordered for an event in 6 days, app said delivery in 10 days without express option for my pincode. Cancelled and bought locally."*
-   - *Non-Monetary Fix:* Live pincode delivery date preview on wishlist cards + guaranteed event delivery badges.
-
-2. **`return_policy_concern` (Confidence: 80%)**
-   - *Customer Quote:* *"Applied platform fee on each item which is non-refundable on returns. Hesitant to order 2 sizes to check fit."*
-   - *Non-Monetary Fix:* Transparent size-exchange guarantees without fee loss + clear door-step size swap assurance.
-
-3. **`quality_uncertainty` / `fit_anxiety`**
-   - *Customer Quote:* *"Silk blend saree color looks emerald green in photo but teal in model video. Fabric transparency unclear."*
-   - *Non-Monetary Fix:* Verified customer fabric close-up photos & body dimension fit distribution graphs.
-
----
-
-## 🧪 Test Suite (59 Tests — All Passing)
-
-Run the automated test suite covering all 4 layers:
+### 4. Launch PM Dashboard & Retrieval MVP
 ```bash
-pytest tests/ -v
+python scripts/run_dashboard.py
+# or
+uvicorn dashboard.api:app --host 0.0.0.0 --port 8000 --reload
 ```
-
-| Test File | Coverage | Tests |
-|---|---|---|
-| `test_scrapers.py` | Google Play & Apify Reddit scrapers | 9 |
-| `test_cleaner.py` | Text cleaning, PII removal, deduplication | 2 |
-| `test_extractor.py` | LLM extraction (mocked), JSON parsing, retry logic | 11 |
-| `test_classifier.py` | Taxonomy mapping, blocker/persona/uncertainty tags | 7 |
-| `test_confidence.py` | Confidence scoring bounds, weighting, edge cases | 6 |
-| `test_analysis.py` | Preprocessor, Classifier, ConfidenceScorer, Aggregator | 5 |
-| `test_database.py` | SQLite CRUD operations | 1 |
-| `test_api.py` | Dashboard HTML & all 5 REST API endpoints | 6 |
-| `test_integration.py` | End-to-end pipeline & API integration | 11 |
-| **Total** | | **59** |
+Open **[http://localhost:8000](http://localhost:8000)** in your browser.
 
 ---
 
-## 🚀 Deployment
+## 🧪 Test Suite
 
-### Option A: Render.com (Recommended — Free, One-Click)
-
-1. Push this repo to GitHub
-2. Go to [render.com/new](https://dashboard.render.com)
-3. Click **"New" → "Blueprint"** and connect your repo
-4. Render auto-detects `render.yaml` and deploys — **no credit card needed**
-
-### Option B: Docker
-
+Run the comprehensive 62-test verification suite:
 ```bash
-# Build the image
-docker build -t myntra-discovery .
-
-# Run with your environment variables
-docker run -p 8000:8000 --env-file .env myntra-discovery
-
-# Open http://localhost:8000
+pytest tests/
 ```
+```
+tests/test_analysis.py .....                                             [  8%]
+tests/test_classifier.py .......                                         [ 19%]
+tests/test_cleaner.py ..                                                 [ 22%]
+tests/test_confidence.py ......                                          [ 32%]
+tests/test_database.py .                                                 [ 33%]
+tests/test_extractor.py ............                                     [ 53%]
+tests/test_integration.py ............                                   [ 72%]
+tests/test_scrapers.py .................                                 [100%]
 
-### Option C: Run Locally (Development)
-```bash
-python scripts/run_dashboard.py --port 8000 --reload
+======================= 62 passed, 2 warnings in 18.69s ========================
 ```
 
 ---
 
-## 📂 Project Structure
+## 🔍 Part 5: AI-Native Retrieval MVP Prototype
+
+The built-in prototype demonstrates how Google Photos can bridge human episodic memory with multi-modal visual retrieval.
+
+### Try Example Queries in the Dashboard:
+1. **Vacation Cafe:** *"breakfast cafe in Goa with blue chairs and coconut trees"*
+   - *Extracted Clues:* Visual Anchors: `blue chairs`, `coffee mug`, `palm trees`; Location: `Goa / Anjuna`; Setting: `outdoor beach cafe`.
+   - *Retrieval Result:* Successfully prioritizes `Cafe Lilliput Breakfast` despite missing exact date tags.
+2. **Receipt Search:** *"restaurant bill from dinner with Rohan last weekend"*
+   - *Extracted Clues:* Category: `receipts_documents`; Companions: `Rohan`; Timeframe: `last weekend`.
+   - *Retrieval Result:* Retrieves `Toit Brewery Dinner Bill` via combined companion and OCR metadata.
+3. **Pet Memory:** *"golden retriever playing in snow in Manali"*
+   - *Extracted Clues:* Subject: `golden retriever dog`; Weather/Season: `snow / winter`; Location: `Manali`.
+   - *Retrieval Result:* Pinpoints `Snow Day with Bruno in Solang Valley`.
+
+### API Reference:
+```bash
+POST /api/retrieval-mvp/search
+Content-Type: application/json
+
+{
+  "query": "breakfast cafe in Goa with blue chairs",
+  "companion_filter": "Rohan",
+  "category_filter": "vacation_travel"
+}
+```
+
+---
+
+## 🚀 Deployment to Render (₹0 Free Tier)
+
+This application is ready to deploy on **Render.com** at zero cost using `render.yaml`:
+
+1. Fork or push to your GitHub account: `https://github.com/Shubham-vvn/google-photos-discovery-engine`
+2. Connect your repo in [Render Dashboard](https://dashboard.render.com).
+3. Select **Web Service** or use the included `render.yaml`.
+4. Build Command: `pip install -r requirements.txt && python scripts/seed_db.py`
+5. Start Command: `uvicorn dashboard.api:app --host 0.0.0.0 --port $PORT`
+6. Set Environment Variables:
+   - `GEMINI_API_KEY`: `<Your Gemini Key>`
+   - `ENVIRONMENT`: `production`
+
+---
+
+## 📂 Repository Structure
 
 ```
-Myntra-discovery-engine/
 ├── config/
-│   ├── settings.py             # Typed environment settings & validation
-│   └── taxonomy.yaml           # Canonical taxonomy (blockers, uncertainties, personas)
+│   ├── settings.py             # App package IDs, API keys, paths
+│   └── taxonomy.yaml           # Cognitive retrieval failure taxonomy & clues
 ├── ingestion/
-│   ├── scrapers/
-│   │   ├── base_scraper.py     # Abstract scraper interface
-│   │   ├── google_play_scraper.py  # Google Play Store reviews
-│   │   ├── reddit_scraper.py   # Reddit via PRAW (free)
-│   │   └── apify_scraper.py    # Reddit via Apify (free $5/mo tier)
-│   ├── cleaners/
-│   │   ├── text_cleaner.py     # HTML stripping, PII removal, emoji decoding
-│   │   └── deduplicator.py     # MinHash LSH near-duplicate detection
-│   ├── normalizer.py           # Unified schema & author hashing
-│   └── orchestrator.py         # Ingestion pipeline coordinator
+│   ├── cleaner.py              # Text normalization & MinHash deduplication
+│   └── scrapers/               # Google Play, iOS App Store, Reddit, Apify
 ├── analysis/
-│   ├── prompts/
-│   │   └── extraction_prompt.txt  # Structured JSON extraction prompt
-│   ├── preprocessor.py         # Relevance keyword filter & segmenter
-│   ├── llm_extractor.py        # Gemini API client with smart rate pacing
-│   ├── classifier.py           # Local sentence-transformers taxonomy mapper
-│   ├── confidence_scorer.py    # 4-factor weighted scoring engine
-│   └── aggregator.py           # Pattern rollup and cross-tabulation
+│   ├── extractor.py            # Gemini 2.5 cognitive retrieval LLM extractor
+│   ├── heuristic_extractor.py  # Offline NLP rule-based fallback extractor
+│   ├── classifier.py           # Multi-label taxonomy classification
+│   ├── confidence_scorer.py    # 4-factor confidence scoring
+│   ├── aggregator.py           # Statistical aggregation of retrieval breakdowns
+│   └── prompts/extraction_prompt.txt
 ├── storage/
-│   └── database.py             # SQLite schema, indices, WAL mode, CRUD
+│   └── database.py             # SQLite WAL database & cognitive query engine
 ├── dashboard/
-│   ├── api.py                  # FastAPI backend — 5 REST endpoints
-│   ├── templates/
-│   │   └── index.html          # Semantic HTML5 glassmorphic dashboard
-│   └── static/
-│       ├── css/style.css       # Glassmorphic design system
-│       └── js/app.js           # Interactive Chart.js visualizations
+│   ├── api.py                  # FastAPI REST endpoints + Part 5 Retrieval MVP
+│   ├── discovery_engine.py     # PM Copilot Gemini query & root-cause analyzer
+│   ├── templates/index.html    # Modern glassmorphism PM discovery dashboard
+│   └── static/                 # CSS & JavaScript for charts, metrics & MVP playground
 ├── scripts/
-│   ├── run_ingestion.py        # CLI: scrape & ingest reviews
-│   ├── run_analysis.py         # CLI: AI extraction & analysis
-│   ├── run_dashboard.py        # CLI: launch dashboard server
-│   └── seed_db.py              # Realistic fashion dataset seeder
-├── tests/                      # 59 automated unit & integration tests
-├── Dockerfile                  # Multi-stage Docker build
-├── render.yaml                 # Render.com one-click deployment config
-├── requirements.txt            # Python dependencies (all free)
-├── .env.example                # Environment variable template
-└── .gitignore                  # Git ignore rules
+│   ├── seed_db.py              # Seeds 300 realistic customer voice records
+│   ├── run_ingestion.py        # CLI ingestion runner
+│   ├── run_analysis.py         # CLI analysis runner
+│   └── run_dashboard.py        # CLI web dashboard runner
+├── tests/                      # 62 unit & end-to-end integration tests
+├── problemStatement.md         # Part 1: Product Framing & Cognitive Failure Breakdown
+├── architecture.md             # System Architecture & ₹0 Stack Design
+├── implementationPlan.md       # Step-by-step Technical Implementation Guide
+└── render.yaml                 # One-click Render deployment configuration
 ```
 
 ---
 
-## 💎 Cost Guarantee & Free Tier Limits
-
-| Service | Free Tier Limit | Our Usage | Headroom |
-|---|---|---|---|
-| **Gemini 3.6 Flash** | 15 RPM, 1M tokens/day | ~5,000 reviews/day | Plenty |
-| **Reddit API (PRAW)** | 100 req/min | ~10-20 req/session | Massive |
-| **Apify** | $5.00/month free credit | ~$0.01 per 10 posts | ~500 scrapes/month |
-| **Google Play Scraper** | No official limit | ~5,000 reviews/run | No issue |
-| **Render Free Tier** | 750 hours/month | 1 instance = ~720 hrs | Under limit |
-| **SQLite** | Unlimited (local file) | ~50K documents | Millions possible |
-| **Hugging Face** | Unlimited (local model) | 80MB one-time download | N/A |
-
-> **Total project cost: ₹0** — Every tool, API, hosting service, and library is completely free.
-
----
-
-## 📜 License
-
-MIT License — see [LICENSE](LICENSE) for details.
+## 📜 NextLeap PM Fellowship Graduation Deliverable
+- **Author:** Shubham Thakur
+- **Project:** Google Photos Core Experience — AI Discovery Engine & Semantic Retrieval MVP
+- **Cohort:** NextLeap Product Management Fellowship (Sep 2026)
+- **License:** MIT

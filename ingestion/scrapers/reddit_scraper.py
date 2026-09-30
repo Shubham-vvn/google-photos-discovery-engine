@@ -14,22 +14,23 @@ from .base_scraper import BaseScraper
 
 class RedditScraper(BaseScraper):
     SUBREDDITS = [
-        "india",
-        "indianfashionadvice",
-        "IndianFashionAddicts",
-        "fashionadvice",
-        "Myntra",
+        "googlephotos",
+        "google",
+        "Android",
+        "techsupport",
+        "GooglePixel",
     ]
     SEARCH_QUERIES = [
-        "myntra wishlist",
-        "myntra cart",
-        "myntra buy",
-        "myntra quality",
-        "myntra size",
-        "myntra review",
-        "online shopping india fashion",
-        "myntra return",
-        "myntra worth buying",
+        "google photos search",
+        "can't find photo google photos",
+        "remember photo google photos",
+        "cant find picture google photos",
+        "search broken google photos",
+        "find receipt google photos",
+        "find screenshot google photos",
+        "how to find old photo google photos",
+        "ask photos search",
+        "google photos scroll fatigue",
     ]
 
     def __init__(self):

@@ -1,5 +1,5 @@
 """
-Myntra Discovery Engine — Central Configuration
+Google Photos Discovery Engine — Central Configuration
 
 Loads environment variables from .env and provides typed settings
 for all modules across the project.
@@ -20,6 +20,18 @@ DATA_DIR = PROJECT_ROOT / "data"
 RAW_DIR = DATA_DIR / "raw"
 PROCESSED_DIR = DATA_DIR / "processed"
 DB_PATH = PROJECT_ROOT / os.getenv("DB_PATH", "data/photos_discovery.db")
+
+# ──────────────────────────────────────────────
+# Target App & Data Sources
+# ──────────────────────────────────────────────
+GOOGLE_PLAY_PACKAGE = "com.google.android.apps.photos"
+APP_STORE_ID = "962194608"  # Google Photos on Apple App Store
+REDDIT_SUBREDDITS = ["googlephotos", "google", "Android", "techsupport"]
+SCRAPE_KEYWORDS = [
+    "search photo", "find photo", "can't find", "cant find",
+    "remember", "lost photo", "old photo", "receipt", "screenshot",
+    "medicine", "cafe", "scroll", "album", "search not working"
+]
 
 # ──────────────────────────────────────────────
 # Google Gemini (Free Tier)

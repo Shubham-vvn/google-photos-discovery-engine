@@ -59,10 +59,14 @@ class ConfidenceScorer:
 
     def _score_completeness(self, extraction: Dict[str, Any]) -> float:
         """More fields extracted = more confident overall."""
-        fields = ["wishlist_motivation", "purchase_blocker",
-                  "uncertainty_type", "shopper_persona"]
-        filled = sum(1 for f in fields if extraction.get(f))
-        return filled / len(fields)
+        photo_fields = ["photo_category", "retrieval_failure_point", "remembered_clues", "user_persona"]
+        legacy_fields = ["wishlist_motivation", "purchase_blocker", "uncertainty_type", "shopper_persona"]
+        
+        filled_photo = sum(1 for f in photo_fields if extraction.get(f))
+        filled_legacy = sum(1 for f in legacy_fields if extraction.get(f))
+        
+        best_filled = max(filled_photo, filled_legacy)
+        return best_filled / 4.0
 
     def _score_source(self, document: Dict[str, Any]) -> float:
         """Score based on source type and metadata."""

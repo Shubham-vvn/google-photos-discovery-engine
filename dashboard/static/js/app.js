@@ -1,12 +1,12 @@
 /**
- * Myntra Discovery Engine — Interactive Dashboard App
+ * Google Photos AI Discovery Engine & Retrieval MVP — Interactive Dashboard App
  */
 
 let state = {
   activeTab: 'overview',
   overviewData: null,
-  blockersData: [],
-  uncertaintiesData: null,
+  failuresData: [],
+  cluesData: null,
   personasData: null,
   charts: {}
 };
@@ -15,6 +15,7 @@ let state = {
 document.addEventListener('DOMContentLoaded', () => {
   initNavigation();
   loadOverviewData();
+  checkLlmStatus();
 });
 
 // Navigation Handler
@@ -25,7 +26,6 @@ function initNavigation() {
       e.preventDefault();
       const targetTab = link.getAttribute('data-tab');
       switchTab(targetTab);
-      // Close sidebar on mobile after navigation
       if (window.innerWidth <= 768) {
         closeMobileSidebar();
       }
@@ -50,8 +50,8 @@ function toggleMobileSidebar() {
 function closeMobileSidebar() {
   const sidebar = document.querySelector('.sidebar');
   const overlay = document.querySelector('.sidebar-overlay');
-  sidebar.classList.remove('sidebar-open');
-  overlay.classList.remove('active');
+  if (sidebar) sidebar.classList.remove('sidebar-open');
+  if (overlay) overlay.classList.remove('active');
   document.body.style.overflow = '';
 }
 
@@ -79,250 +79,134 @@ function switchTab(tabId) {
 
   // Update Top Bar Title
   const titles = {
-    overview: 'Discovery Engine Overview',
-    blockers: 'Conversion Blockers Analysis',
-    uncertainties: 'Customer Uncertainty Matrix',
-    personas: 'Shopper Personas Breakdown',
-    discovery: 'AI Discovery Engine'
+    overview: 'Discovery Engine Overview & Metric Funnel',
+    failures: 'Ranked Retrieval Failure Modes',
+    clues: 'Cognitive Memory: Clues Remembered vs Forgotten',
+    personas: 'Target User Personas Breakdown',
+    discovery: 'AI Discovery Engine Copilot',
+    mvp: 'Part 5: AI-Native Retrieval MVP Prototype'
   };
   const titleEl = document.getElementById('top-bar-title');
   if (titleEl) titleEl.innerText = titles[tabId] || 'Dashboard';
 
   // Load Tab Specific Data
-  if (tabId === 'blockers' && state.blockersData.length === 0) {
-    loadBlockersData();
-  } else if (tabId === 'uncertainties' && !state.uncertaintiesData) {
-    loadUncertaintiesData();
+  if (tabId === 'failures' && state.failuresData.length === 0) {
+    loadFailuresData();
+  } else if (tabId === 'clues' && !state.cluesData) {
+    loadCluesData();
   } else if (tabId === 'personas' && !state.personasData) {
     loadPersonasData();
-  } else if (tabId === 'discovery') {
-    initDiscoveryTab();
+  } else if (tabId === 'mvp') {
+    // Run an initial search to populate candidate results
+    const input = document.getElementById('mvp-search-input');
+    if (input && input.value) {
+      executeMvpSearch();
+    }
   }
 }
 
 // ──────────────────────────────────────────────
-// 1. Overview Tab
+// Overview Tab
 // ──────────────────────────────────────────────
 async function loadOverviewData() {
   try {
     const res = await fetch('/api/overview');
     const json = await res.json();
-    if (json.status === 'success') {
-      state.overviewData = json.data;
-      renderOverviewStats(json.data.stats);
-      renderOverviewCharts(json.data);
-      renderRecentFeed(json.data.topBlockers);
-    }
+    if (json.status !== 'success') return;
+
+    const data = json.data;
+    state.overviewData = data;
+
+    // Update Hero Stats
+    const stats = data.stats || {};
+    const totalDocsEl = document.getElementById('stat-total-docs');
+    const totalExtsEl = document.getElementById('stat-total-extractions');
+    const avgConfEl = document.getElementById('stat-avg-conf');
+
+    if (totalDocsEl) totalDocsEl.innerText = (stats.total_documents || 0).toLocaleString();
+    if (totalExtsEl) totalExtsEl.innerText = (stats.total_extractions || 0).toLocaleString();
+    if (avgConfEl) avgConfEl.innerText = `${((stats.avg_confidence || 0) * 100).toFixed(1)}%`;
+
+    // Render Overview Charts
+    renderOverviewFailuresChart(data.topFailures || data.topBlockers || []);
+    renderOverviewCategoriesChart(data.photoCategories || {});
   } catch (err) {
-    console.error('Failed to load overview data:', err);
+    console.error('Error loading overview data:', err);
   }
 }
 
-function renderOverviewStats(stats) {
-  document.getElementById('stat-total-docs').innerText = stats.total_documents || 0;
-  document.getElementById('stat-total-extractions').innerText = stats.total_extractions || 0;
-  document.getElementById('stat-avg-conf').innerText = (stats.avg_confidence * 100).toFixed(1) + '%';
-  
-  const sourcesText = Object.entries(stats.sources || {})
-    .map(([src, count]) => `${src}: ${count}`)
-    .join(' | ') || 'Google Play Store';
-  document.getElementById('stat-sources').innerText = sourcesText;
-}
-
-function renderOverviewCharts(data) {
-  // Chart 1: Top Blockers Bar Chart
-  const ctxBlockers = document.getElementById('chart-top-blockers');
-  if (ctxBlockers) {
-    if (state.charts.blockers) state.charts.blockers.destroy();
-    
-    const blockers = data.topBlockers || [];
-    const labels = blockers.map(b => b.blocker_tag.replace(/_/g, ' '));
-    const counts = blockers.map(b => b.occurrence_count);
-    const weighted = blockers.map(b => b.weighted_count);
-
-    state.charts.blockers = new Chart(ctxBlockers, {
-      type: 'bar',
-      data: {
-        labels: labels,
-        datasets: [
-          {
-            label: 'Weighted Impact',
-            data: weighted,
-            backgroundColor: 'rgba(99, 102, 241, 0.85)',
-            borderRadius: 6,
-          },
-          {
-            label: 'Raw Count',
-            data: counts,
-            backgroundColor: 'rgba(168, 85, 247, 0.4)',
-            borderRadius: 6,
-          }
-        ]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-          legend: { labels: { color: '#9aa0b4', font: { family: 'Plus Jakarta Sans' } } }
-        },
-        scales: {
-          x: { ticks: { color: '#9aa0b4', font: { family: 'Plus Jakarta Sans', size: 11 } }, grid: { display: false } },
-          y: { ticks: { color: '#9aa0b4' }, grid: { color: 'rgba(255,255,255,0.05)' } }
-        }
-      }
-    });
-  }
-
-  // Chart 2: Confidence Distribution Donut
-  const ctxConf = document.getElementById('chart-confidence-dist');
-  if (ctxConf) {
-    if (state.charts.confidence) state.charts.confidence.destroy();
-    
-    const confDist = data.confidenceDistribution || {};
-    state.charts.confidence = new Chart(ctxConf, {
-      type: 'doughnut',
-      data: {
-        labels: ['High (0.7-1.0)', 'Medium (0.4-0.7)', 'Low (0.0-0.4)'],
-        datasets: [{
-          data: [
-            confDist['high (0.7-1.0)'] || 0,
-            confDist['medium (0.4-0.7)'] || 0,
-            confDist['low (0.0-0.4)'] || 0
-          ],
-          backgroundColor: ['#10b981', '#f59e0b', '#ef4444'],
-          borderWidth: 0
-        }]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-          legend: { position: 'bottom', labels: { color: '#9aa0b4', font: { family: 'Plus Jakarta Sans', size: 11 } } }
-        },
-        cutout: '70%'
-      }
-    });
-  }
-}
-
-function renderRecentFeed(topBlockers) {
-  const container = document.getElementById('recent-feed-container');
-  if (!container) return;
-
-  if (!topBlockers || topBlockers.length === 0) {
-    container.innerHTML = '<p class="stat-desc">No blocker patterns generated yet.</p>';
-    return;
-  }
-
-  container.innerHTML = topBlockers.map((b, i) => `
-    <div class="blocker-card" style="margin-bottom: 12px; padding: 16px;">
-      <div style="display: flex; justify-content: space-between; align-items: center;">
-        <div style="display: flex; align-items: center; gap: 10px;">
-          <span class="blocker-rank">${i+1}</span>
-          <span style="font-weight: 700; color: #fff; text-transform: capitalize;">${b.blocker_tag.replace(/_/g, ' ')}</span>
-        </div>
-        <span class="badge badge-high">${(b.avg_confidence * 100).toFixed(0)}% Confidence</span>
-      </div>
-    </div>
-  `).join('');
-}
-
-// ──────────────────────────────────────────────
-// 2. Purchase Blockers Tab
-// ──────────────────────────────────────────────
-async function loadBlockersData() {
-  const container = document.getElementById('blockers-list-container');
-  container.innerHTML = '<p style="color: var(--text-secondary); text-align: center; padding: 40px;">Loading blocker analysis...</p>';
-
-  try {
-    const res = await fetch('/api/blockers');
-    const json = await res.json();
-    if (json.status === 'success') {
-      state.blockersData = json.data;
-      renderBlockersList(json.data);
-    }
-  } catch (err) {
-    console.error('Failed to load blockers:', err);
-  }
-}
-
-function renderBlockersList(blockers) {
-  const container = document.getElementById('blockers-list-container');
-  if (!blockers || blockers.length === 0) {
-    container.innerHTML = '<p style="color: var(--text-secondary);">No blockers extracted yet.</p>';
-    return;
-  }
-
-  container.innerHTML = blockers.map((b, i) => {
-    const quotes = b.sample_texts || [];
-    const confClass = b.avg_confidence >= 0.7 ? 'badge-high' : b.avg_confidence >= 0.4 ? 'badge-med' : 'badge-low';
-    
-    return `
-      <div class="blocker-card">
-        <div class="blocker-top">
-          <div class="blocker-tag-title">
-            <div class="blocker-rank">${i + 1}</div>
-            <div>
-              <div class="blocker-name">${b.blocker_tag.replace(/_/g, ' ')}</div>
-              <span class="stat-desc">Identified across ${b.occurrence_count} customer reviews</span>
-            </div>
-          </div>
-          <div class="metrics-pills">
-            <span class="badge badge-neutral">Weighted Impact: <strong>${b.weighted_count}</strong></span>
-            <span class="badge ${confClass}">${(b.avg_confidence * 100).toFixed(0)}% Confidence</span>
-          </div>
-        </div>
-
-        ${quotes.length > 0 ? `
-          <div style="margin-top: 14px;">
-            <span style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.6px; color: var(--text-muted); font-weight: 700;">Customer Voice Evidence:</span>
-            ${quotes.slice(0, 2).map(q => `
-              <div class="quote-box">"${q}"</div>
-            `).join('')}
-          </div>
-        ` : ''}
-      </div>
-    `;
-  }).join('');
-}
-
-// ──────────────────────────────────────────────
-// 3. Uncertainties Tab
-// ──────────────────────────────────────────────
-async function loadUncertaintiesData() {
-  try {
-    const res = await fetch('/api/uncertainties');
-    const json = await res.json();
-    if (json.status === 'success') {
-      state.uncertaintiesData = json.data;
-      renderUncertaintiesRadar(json.data.distribution);
-    }
-  } catch (err) {
-    console.error('Failed to load uncertainties:', err);
-  }
-}
-
-function renderUncertaintiesRadar(dist) {
-  const ctx = document.getElementById('chart-uncertainty-radar');
+function renderOverviewFailuresChart(failures) {
+  const ctx = document.getElementById('overview-failures-chart');
   if (!ctx) return;
 
-  if (state.charts.radar) state.charts.radar.destroy();
+  if (state.charts['overview-failures']) {
+    state.charts['overview-failures'].destroy();
+  }
 
-  const labels = Object.keys(dist || {}).map(k => k.toUpperCase());
-  const counts = Object.values(dist || {});
+  const labels = failures.slice(0, 5).map(f => (f.failure_tag || f.blocker_tag || '').replace(/_/g, ' '));
+  const counts = failures.slice(0, 5).map(f => f.occurrence_count || 0);
 
-  state.charts.radar = new Chart(ctx, {
-    type: 'polarArea',
+  state.charts['overview-failures'] = new Chart(ctx, {
+    type: 'bar',
     data: {
       labels: labels,
       datasets: [{
+        label: 'User Reports',
         data: counts,
         backgroundColor: [
-          'rgba(99, 102, 241, 0.7)',
-          'rgba(255, 63, 108, 0.7)',
-          'rgba(16, 185, 129, 0.7)',
-          'rgba(245, 158, 11, 0.7)',
-          'rgba(6, 182, 212, 0.7)'
+          '#1a73e8',
+          '#ea4335',
+          '#fbbc04',
+          '#34a853',
+          '#8ab4f8'
+        ],
+        borderRadius: 8
+      }]
+    },
+    options: {
+      indexAxis: 'y',
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false }
+      },
+      scales: {
+        x: {
+          grid: { color: 'rgba(255, 255, 255, 0.05)' },
+          ticks: { color: '#9aa0b4' }
+        },
+        y: {
+          grid: { display: false },
+          ticks: { color: '#f3f4f8', font: { family: 'Outfit', size: 12 } }
+        }
+      }
+    }
+  });
+}
+
+function renderOverviewCategoriesChart(categories) {
+  const ctx = document.getElementById('overview-categories-chart');
+  if (!ctx) return;
+
+  if (state.charts['overview-categories']) {
+    state.charts['overview-categories'].destroy();
+  }
+
+  const labels = Object.keys(categories).map(k => k.replace(/_/g, ' '));
+  const data = Object.values(categories);
+
+  state.charts['overview-categories'] = new Chart(ctx, {
+    type: 'doughnut',
+    data: {
+      labels: labels,
+      datasets: [{
+        data: data,
+        backgroundColor: [
+          '#1a73e8',
+          '#ea4335',
+          '#fbbc04',
+          '#34a853',
+          '#a855f7'
         ],
         borderWidth: 0
       }]
@@ -330,139 +214,312 @@ function renderUncertaintiesRadar(dist) {
     options: {
       responsive: true,
       maintainAspectRatio: false,
-      scales: {
-        r: {
-          ticks: { color: '#9aa0b4', backdropColor: 'transparent' },
-          grid: { color: 'rgba(255,255,255,0.06)' }
+      plugins: {
+        legend: {
+          position: 'right',
+          labels: { color: '#9aa0b4', font: { family: 'Plus Jakarta Sans', size: 12 }, padding: 12 }
         }
       },
-      plugins: {
-        legend: { position: 'right', labels: { color: '#9aa0b4', font: { family: 'Plus Jakarta Sans' } } }
-      }
+      cutout: '68%'
     }
   });
 }
 
 // ──────────────────────────────────────────────
-// 4. Personas Tab
+// Retrieval Failures Tab
+// ──────────────────────────────────────────────
+async function loadFailuresData() {
+  const container = document.getElementById('failures-list-container');
+  if (!container) return;
+
+  try {
+    const res = await fetch('/api/failures');
+    const json = await res.json();
+    if (json.status !== 'success') return;
+
+    state.failuresData = json.data;
+    renderFailuresList(json.data);
+  } catch (err) {
+    container.innerHTML = '<div class="error-msg">Failed to load failure points.</div>';
+  }
+}
+
+function renderFailuresList(failures) {
+  const container = document.getElementById('failures-list-container');
+  if (!container) return;
+
+  if (!failures || failures.length === 0) {
+    container.innerHTML = '<div class="empty-state">No failure modes recorded.</div>';
+    return;
+  }
+
+  let html = '';
+  failures.forEach((f, idx) => {
+    const tag = (f.failure_tag || f.blocker_tag || '').replace(/_/g, ' ');
+    const count = f.occurrence_count || 0;
+    const conf = Math.round((f.avg_confidence || 0.8) * 100);
+    const samples = f.sample_texts || [];
+
+    html += `
+      <div class="evidence-card">
+        <div class="evidence-header">
+          <div class="tag-title">
+            <span class="rank-badge">#${idx + 1}</span>
+            <span class="failure-title-text">${tag}</span>
+          </div>
+          <div class="metric-chips">
+            <span class="metric-chip">${count} Customer Reports</span>
+            <span class="metric-chip conf-chip">${conf}% Confidence</span>
+          </div>
+        </div>
+        <div class="evidence-quotes">
+          ${samples.slice(0, 3).map(quote => `
+            <div class="quote-item">
+              <span class="quote-icon">“</span>
+              <p class="quote-text">${quote}</p>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+    `;
+  });
+
+  container.innerHTML = html;
+}
+
+// ──────────────────────────────────────────────
+// Memory Clues vs Forgotten Tab
+// ──────────────────────────────────────────────
+async function loadCluesData() {
+  try {
+    const res = await fetch('/api/clues');
+    const json = await res.json();
+    if (json.status !== 'success') return;
+
+    state.cluesData = json.data;
+    renderCluesCharts(json.data);
+  } catch (err) {
+    console.error('Error loading clues data:', err);
+  }
+}
+
+function renderCluesCharts(data) {
+  // Chart 1: What Users Remember
+  const ctxRem = document.getElementById('remembered-clues-chart');
+  if (ctxRem) {
+    if (state.charts['remembered-clues']) state.charts['remembered-clues'].destroy();
+
+    const remLabels = Object.keys(data.rememberedClues || {}).map(k => k.replace(/_/g, ' '));
+    const remValues = Object.values(data.rememberedClues || {});
+
+    state.charts['remembered-clues'] = new Chart(ctxRem, {
+      type: 'bar',
+      data: {
+        labels: remLabels,
+        datasets: [{
+          label: 'Frequency Retained',
+          data: remValues,
+          backgroundColor: '#1a73e8',
+          borderRadius: 8
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: {
+          x: { grid: { color: 'rgba(255, 255, 255, 0.05)' }, ticks: { color: '#9aa0b4' } },
+          y: { grid: { color: 'rgba(255, 255, 255, 0.05)' }, ticks: { color: '#9aa0b4' } }
+        }
+      }
+    });
+  }
+
+  // Chart 2: What Users Forget
+  const ctxForg = document.getElementById('forgotten-elements-chart');
+  if (ctxForg) {
+    if (state.charts['forgotten-elements']) state.charts['forgotten-elements'].destroy();
+
+    const forgLabels = Object.keys(data.forgottenElements || {}).map(k => k.replace(/_/g, ' '));
+    const forgValues = Object.values(data.forgottenElements || {});
+
+    state.charts['forgotten-elements'] = new Chart(ctxForg, {
+      type: 'bar',
+      data: {
+        labels: forgLabels,
+        datasets: [{
+          label: 'Frequency Forgotten',
+          data: forgValues,
+          backgroundColor: '#ea4335',
+          borderRadius: 8
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: {
+          x: { grid: { color: 'rgba(255, 255, 255, 0.05)' }, ticks: { color: '#9aa0b4' } },
+          y: { grid: { color: 'rgba(255, 255, 255, 0.05)' }, ticks: { color: '#9aa0b4' } }
+        }
+      }
+    });
+  }
+}
+
+// ──────────────────────────────────────────────
+// Personas Tab
 // ──────────────────────────────────────────────
 async function loadPersonasData() {
+  const container = document.getElementById('personas-cards-container');
+  if (!container) return;
+
   try {
     const res = await fetch('/api/personas');
     const json = await res.json();
-    if (json.status === 'success') {
-      state.personasData = json.data;
-      renderPersonaCards(json.data.personas);
-      renderCrosstabTable(json.data.crosstab);
-    }
+    if (json.status !== 'success') return;
+
+    state.personasData = json.data;
+    renderPersonas(json.data);
   } catch (err) {
-    console.error('Failed to load personas:', err);
+    container.innerHTML = '<div class="error-msg">Failed to load personas.</div>';
   }
 }
 
-function renderPersonaCards(personas) {
-  const container = document.getElementById('persona-cards-container');
+function renderPersonas(data) {
+  const container = document.getElementById('personas-cards-container');
   if (!container) return;
 
-  container.innerHTML = (personas || []).map(p => `
-    <div class="stat-card">
-      <div class="stat-header">
-        <span class="stat-title">${p.shopper_persona.replace(/_/g, ' ')}</span>
-        <div class="stat-icon-badge stat-icon-purple">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+  const personaDescriptions = {
+    life_documenter: {
+      title: 'The Life Documenter',
+      subtitle: '25,000+ photos, heavy daily capture',
+      desc: 'Takes hundreds of photos per trip and casual day. Suffers the most from unranked search overload and 20-minute timeline scroll fatigue.',
+      icon: '📸'
+    },
+    visual_note_taker: {
+      title: 'The Visual Note-Taker',
+      subtitle: 'Uses camera as external memory',
+      desc: 'Snaps medicine strips, receipts, warranty serial numbers, parking tickets. Struggles when OCR fails to index blurry or shiny foil text.',
+      icon: '📝'
+    },
+    nostalgia_seeker: {
+      title: 'The Nostalgia Seeker',
+      subtitle: 'Emotional archivist (5–10 years)',
+      desc: 'Searches for deep personal memories from college days or deceased family members. Cannot recall exact years; faces broken archive jumps.',
+      icon: '🕰️'
+    },
+    screenshot_curator: {
+      title: 'The Screenshot Curator',
+      subtitle: 'Thousands of unindexed screenshots',
+      desc: 'Saves book recommendations, recipes, and Twitter threads. Search fails because visual screenshot context and app UI are completely unindexed.',
+      icon: '📱'
+    },
+    family_archivist: {
+      title: 'The Family Archivist',
+      subtitle: 'Preserving family & children milestones',
+      desc: 'Tracks kids growing up, school performances, and family holidays. Desperately wants expression/mood filters like "funny messy meal".',
+      icon: '👨‍👩‍👧'
+    }
+  };
+
+  const personas = data.personas || [];
+  let html = '';
+
+  personas.forEach(p => {
+    const rawKey = p.user_persona || p.shopper_persona || '';
+    const meta = personaDescriptions[rawKey] || {
+      title: rawKey.replace(/_/g, ' ').toUpperCase(),
+      subtitle: 'Photo Search User',
+      desc: 'Discovered behavioral cohort in Google Photos.',
+      icon: '👤'
+    };
+
+    html += `
+      <div class="persona-card">
+        <div class="persona-header">
+          <span class="persona-icon">${meta.icon}</span>
+          <div>
+            <h4>${meta.title}</h4>
+            <span class="persona-sub">${meta.subtitle}</span>
+          </div>
+          <div class="persona-count">${p.count} Reports</div>
+        </div>
+        <p class="persona-desc">${meta.desc}</p>
+        <div class="persona-stat-row">
+          <span>Signal Confidence:</span>
+          <strong>${Math.round((p.avg_conf || 0.8) * 100)}%</strong>
         </div>
       </div>
-      <div class="stat-value">${p.count}</div>
-      <div class="stat-desc">Avg Confidence: ${(p.avg_conf * 100).toFixed(0)}%</div>
-    </div>
-  `).join('');
-}
-
-function renderCrosstabTable(crosstab) {
-  const container = document.getElementById('crosstab-container');
-  if (!container) return;
-
-  const rows = [];
-  Object.entries(crosstab || {}).forEach(([persona, blockers]) => {
-    blockers.forEach(b => {
-      rows.push(`
-        <tr>
-          <td style="font-weight: 700; color: #fff; text-transform: capitalize;">${persona.replace(/_/g, ' ')}</td>
-          <td style="color: var(--accent-primary); font-weight: 600; text-transform: capitalize;">${b.blocker.replace(/_/g, ' ')}</td>
-          <td style="font-weight: 600;">${b.count}</td>
-          <td><span class="badge badge-high">${(b.avg_confidence * 100).toFixed(0)}%</span></td>
-        </tr>
-      `);
-    });
+    `;
   });
 
-  container.innerHTML = `
-    <table class="crosstab-table">
-      <thead>
-        <tr>
-          <th>Shopper Persona</th>
-          <th>Top Conversion Blocker</th>
-          <th>Frequency</th>
-          <th>Confidence</th>
-        </tr>
-      </thead>
-      <tbody>
-        ${rows.join('') || '<tr><td colspan="4" style="text-align:center; color:var(--text-muted);">No cross-tabulated records found</td></tr>'}
-      </tbody>
-    </table>
-  `;
+  container.innerHTML = html;
 }
 
-
-
 // ──────────────────────────────────────────────
-// 6. AI Discovery Engine Tab
+// Discovery Engine Q&A Copilot
 // ──────────────────────────────────────────────
-let discoveryInitialized = false;
+async function checkLlmStatus() {
+  const chip = document.getElementById('llm-connection-chip');
+  if (!chip) return;
 
-function initDiscoveryTab() {
-  if (discoveryInitialized) return;
-  discoveryInitialized = true;
-
-  // Chip click handlers
-  document.querySelectorAll('.discovery-chip').forEach(chip => {
-    chip.addEventListener('click', () => {
-      const question = chip.getAttribute('data-question');
-      const input = document.getElementById('discovery-question-input');
-      if (input) {
-        input.value = question;
-        askDiscoveryEngine();
-      }
-    });
-  });
-
-  // Enter key handler
-  const input = document.getElementById('discovery-question-input');
-  if (input) {
-    input.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter' && !e.shiftKey) {
-        e.preventDefault();
-        askDiscoveryEngine();
-      }
-    });
+  try {
+    const res = await fetch('/api/llm-status');
+    const json = await res.json();
+    if (json.connected) {
+      chip.innerText = `Connected (${json.active_model})`;
+      chip.style.borderColor = 'rgba(52, 168, 83, 0.4)';
+      chip.style.color = '#34a853';
+    } else {
+      chip.innerText = 'Offline Fallback Ready';
+      chip.style.borderColor = 'rgba(251, 188, 4, 0.4)';
+      chip.style.color = '#fbbc04';
+    }
+  } catch (e) {
+    chip.innerText = 'Offline Fallback Ready';
   }
 }
 
-async function askDiscoveryEngine() {
-  const input = document.getElementById('discovery-question-input');
-  const askBtn = document.getElementById('discovery-ask-btn');
-  const loadingEl = document.getElementById('discovery-loading');
-  const answerArea = document.getElementById('discovery-answer-area');
-  const evidenceSection = document.getElementById('discovery-evidence-section');
+function askPresetQuestion(question) {
+  const input = document.getElementById('chat-input');
+  if (input) {
+    input.value = question;
+    sendUserQuestion();
+  }
+}
 
-  const question = input?.value?.trim();
-  if (!question) return;
+async function sendUserQuestion() {
+  const input = document.getElementById('chat-input');
+  const history = document.getElementById('chat-history-container');
+  const btn = document.getElementById('btn-send-chat');
 
-  // Show loading, hide previous results
-  loadingEl.style.display = 'flex';
-  answerArea.style.display = 'none';
-  evidenceSection.style.display = 'none';
-  askBtn.disabled = true;
+  if (!input || !input.value.trim()) return;
+  const question = input.value.trim();
+
+  // Append user message
+  const userMsgHtml = `
+    <div class="chat-message user-message">
+      <div class="message-badge">Product Fellow</div>
+      <div class="message-content">${question}</div>
+    </div>
+  `;
+  history.innerHTML += userMsgHtml;
+  input.value = '';
+
+  // Append loading placeholder
+  const loadingId = `loading-${Date.now()}`;
+  history.innerHTML += `
+    <div class="chat-message assistant-message" id="${loadingId}">
+      <div class="message-badge">Google Photos PM Copilot</div>
+      <div class="message-content">
+        <em>Analyzing research database and synthesizing evidence...</em>
+      </div>
+    </div>
+  `;
+  history.scrollTop = history.scrollHeight;
+
+  btn.disabled = true;
 
   try {
     const res = await fetch('/api/ask', {
@@ -470,114 +527,99 @@ async function askDiscoveryEngine() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ question })
     });
-
     const json = await res.json();
 
-    if (json.status === 'success' && json.data) {
-      renderDiscoveryAnswer(json.data);
-    } else {
-      renderDiscoveryAnswer({
-        answer: '❌ **Unexpected Error**\n\nSomething went wrong while processing your question. Please try again.',
-        source_type: 'not_found',
-        evidence_used: [],
-        confidence: 0,
-      });
+    const loadingEl = document.getElementById(loadingId);
+    if (loadingEl && json.status === 'success') {
+      const parsedMarkdown = marked.parse(json.data.answer);
+      loadingEl.innerHTML = `
+        <div class="message-badge">Google Photos PM Copilot (${json.data.model_used})</div>
+        <div class="message-content">${parsedMarkdown}</div>
+      `;
+    } else if (loadingEl) {
+      loadingEl.innerHTML = `<div class="error-msg">Failed to generate answer.</div>`;
     }
   } catch (err) {
-    console.error('Discovery Engine error:', err);
-    renderDiscoveryAnswer({
-      answer: '❌ **Connection Error**\n\nCould not reach the AI Discovery Engine. Please check that the server is running and try again.',
-      source_type: 'not_found',
-      evidence_used: [],
-      confidence: 0,
-    });
+    const loadingEl = document.getElementById(loadingId);
+    if (loadingEl) loadingEl.innerHTML = `<div class="error-msg">Error: ${err.message}</div>`;
   } finally {
-    loadingEl.style.display = 'none';
-    askBtn.disabled = false;
+    btn.disabled = false;
+    history.scrollTop = history.scrollHeight;
   }
 }
 
-function renderDiscoveryAnswer(data) {
-  const answerArea = document.getElementById('discovery-answer-area');
-  const sourceBadge = document.getElementById('discovery-source-badge');
-  const answerContent = document.getElementById('discovery-answer-content');
-  const evidenceSection = document.getElementById('discovery-evidence-section');
-  const evidenceGrid = document.getElementById('discovery-evidence-grid');
+// ──────────────────────────────────────────────
+// Part 5: AI-Native Retrieval MVP Prototype
+// ──────────────────────────────────────────────
+function setMvpQuery(q) {
+  const input = document.getElementById('mvp-search-input');
+  if (input) {
+    input.value = q;
+    executeMvpSearch();
+  }
+}
 
-  // Source badge
-  const sourceConfig = {
-    research: {
-      text: '📊 Answered from Research Data',
-      className: 'source-research',
-    },
-    llm: {
-      text: '🤖 Answered by AI (General Knowledge)',
-      className: 'source-llm',
-    },
-    not_found: {
-      text: '⚠️ Limited or No Data Available',
-      className: 'source-not-found',
+async function executeMvpSearch() {
+  const input = document.getElementById('mvp-search-input');
+  const grid = document.getElementById('mvp-results-grid');
+  const countEl = document.getElementById('mvp-match-count');
+
+  if (!input || !input.value.trim()) return;
+  const query = input.value.trim();
+
+  grid.innerHTML = '<div class="mvp-empty-state"><p>Running associative memory search across photo candidate library...</p></div>';
+  if (countEl) countEl.innerText = 'Searching...';
+
+  try {
+    const res = await fetch('/api/retrieval-mvp/search', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ query })
+    });
+    const json = await res.json();
+
+    if (json.status !== 'success' || !json.results || json.results.length === 0) {
+      grid.innerHTML = `
+        <div class="mvp-empty-state">
+          <p>No high-confidence matches found in sample album for: "${query}". Try one of the real test scenario chips above!</p>
+        </div>
+      `;
+      if (countEl) countEl.innerText = '0 matches';
+      return;
     }
-  };
 
-  const config = sourceConfig[data.source_type] || sourceConfig.not_found;
-  sourceBadge.textContent = config.text;
-  sourceBadge.className = `discovery-source-badge ${config.className}`;
+    if (countEl) countEl.innerText = `${json.matches_found} candidate photos retrieved`;
 
-  // Render markdown answer
-  let renderedHtml = '';
-  if (typeof marked !== 'undefined' && marked.parse) {
-    renderedHtml = marked.parse(data.answer || '');
-  } else {
-    // Fallback: basic formatting
-    renderedHtml = (data.answer || '')
-      .replace(/\n/g, '<br>')
-      .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-  }
+    let html = '';
+    json.results.forEach(item => {
+      const p = item.photo;
+      const confPct = Math.round(item.confidence_score * 100);
 
-  answerContent.innerHTML = renderedHtml;
-
-  // Add stats pills if available
-  if (data.stats) {
-    const statsHtml = `
-      <div class="discovery-stats-pills">
-        <span class="discovery-stats-pill">📄 <strong>${data.stats.extractions_matched || 0}</strong> evidence records matched</span>
-        <span class="discovery-stats-pill">🚧 <strong>${data.stats.blockers_available || 0}</strong> blockers analyzed</span>
-        <span class="discovery-stats-pill">👥 <strong>${data.stats.personas_available || 0}</strong> personas identified</span>
-        ${data.confidence ? `<span class="discovery-stats-pill">🎯 Avg confidence: <strong>${(data.confidence * 100).toFixed(0)}%</strong></span>` : ''}
-      </div>
-    `;
-    answerContent.innerHTML += statsHtml;
-  }
-
-  // Show the answer area with animation
-  answerArea.style.display = 'block';
-
-  // Evidence cards (only for research-backed answers)
-  if (data.source_type === 'research' && data.evidence_used && data.evidence_used.length > 0) {
-    evidenceGrid.innerHTML = data.evidence_used.map(ev => {
-      const confClass = ev.confidence >= 0.7 ? 'badge-high' : ev.confidence >= 0.4 ? 'badge-med' : 'badge-low';
-      return `
-        <div class="evidence-card">
-          <div>
-            <div class="evidence-header">
-              <span class="source-tag">${ev.source || 'UNKNOWN'}</span>
-              <span class="badge ${confClass}">${(ev.confidence * 100).toFixed(0)}% Conf</span>
-            </div>
-            <p class="evidence-text">"${ev.text}"</p>
+      html += `
+        <div class="mvp-photo-card">
+          <div class="mvp-photo-img-wrap">
+            <img src="${p.image_url}" alt="${p.title}" class="mvp-photo-img" loading="lazy">
+            <span class="mvp-confidence-pill">${confPct}% Match Confidence</span>
           </div>
-          <div class="evidence-footer">
-            <div>
-              <div style="font-size: 11px; color: var(--text-muted); text-transform: uppercase;">Blocker:</div>
-              <div style="font-size: 12.5px; font-weight: 700; color: #fff;">${ev.blocker ? ev.blocker.replace(/_/g, ' ') : 'N/A'}</div>
+          <div class="mvp-photo-info">
+            <h4 class="mvp-photo-title">${p.title}</h4>
+            <div class="mvp-meta-row">
+              <span>📅 ${p.approx_date}</span>
+              ${p.companion !== 'None' ? `<span>👥 With: ${p.companion}</span>` : ''}
             </div>
-            <span class="persona-tag">${ev.persona ? ev.persona.replace(/_/g, ' ') : ''}</span>
+            <div class="clues-tags-wrap">
+              ${item.matched_clues.map(c => `<span class="clue-badge">${c}</span>`).join('')}
+            </div>
+            <div class="mvp-reasoning">
+              <strong>Associative Match:</strong> ${item.retrieval_reasoning}
+            </div>
           </div>
         </div>
       `;
-    }).join('');
-    evidenceSection.style.display = 'block';
-  } else {
-    evidenceSection.style.display = 'none';
+    });
+
+    grid.innerHTML = html;
+  } catch (err) {
+    grid.innerHTML = `<div class="error-msg">Search error: ${err.message}</div>`;
   }
 }

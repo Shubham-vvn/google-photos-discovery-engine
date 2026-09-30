@@ -21,7 +21,7 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 
 def main():
     parser = argparse.ArgumentParser(
-        description="Myntra Discovery Engine — Data Ingestion"
+        description="Google Photos Discovery Engine — Data Ingestion"
     )
     parser.add_argument(
         "--gp-count", type=int, default=5000,

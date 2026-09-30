@@ -17,23 +17,17 @@ from ingestion.scrapers.base_scraper import BaseScraper
 class ApifyRedditScraper(BaseScraper):
     """Scrapes Reddit discussions via Apify actor with credit conservation."""
 
-    SUBREDDITS = ["IndianFashionAddicts", "indianfashionadvice", "india", "fashionph"]
+    SUBREDDITS = ["googlephotos", "google", "Android", "techsupport", "GooglePixel"]
     SEARCH_QUERIES = [
-        "myntra wishlist",
-        "myntra saved for later",
-        "myntra price drop wishlist",
-        "myntra out of stock wishlist",
-        "myntra wishlist limit",
-        "myntra wishlist vs cart",
-        "myntra return order quality",
-        "myntra size fit issue",
-        "myntra quality fabric",
-        "myntra vs ajio fashion",
-        "myntra vs amazon fashion",
-        "myntra vs flipkart fashion",
-        "myntra vs meesho",
-        "myntra wishlist not buying",
-        "myntra wishlist bookmark",
+        "google photos search photo",
+        "google photos can't find picture",
+        "google photos search broken",
+        "google photos remember photo",
+        "google photos find receipt",
+        "google photos find screenshot",
+        "google photos search not working",
+        "google photos scroll through thousands",
+        "ask photos google",
     ]
 
     def __init__(self, token: Optional[str] = None):

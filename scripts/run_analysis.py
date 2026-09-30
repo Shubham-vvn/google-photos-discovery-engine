@@ -130,19 +130,22 @@ def main():
                     "doc_id": doc["doc_id"],
                     "segment_index": seg_idx,
                     "segment_text": segment,
-                    "wishlist_motivation": result["extraction"].get("wishlist_motivation"),
-                    "purchase_blocker": result["extraction"].get("purchase_blocker"),
-                    "uncertainty_types": result["extraction"].get("uncertainty_type", []),
-                    "shopper_persona": result["extraction"].get("shopper_persona"),
+                    "photo_category": result["extraction"].get("photo_category"),
+                    "target_photo_description": result["extraction"].get("target_photo_description"),
+                    "remembered_clues": result["extraction"].get("remembered_clues", []),
+                    "remembered_details": result["extraction"].get("remembered_details"),
+                    "forgotten_elements": result["extraction"].get("forgotten_elements", []),
+                    "search_query_attempted": result["extraction"].get("search_query_attempted"),
+                    "search_behavior": result["extraction"].get("search_behavior"),
+                    "retrieval_failure_point": result["extraction"].get("retrieval_failure_point"),
+                    "user_frustration_detail": result["extraction"].get("user_frustration_detail"),
+                    "user_persona": result["extraction"].get("user_persona"),
                     "evidence_type": result["extraction"].get("evidence_type"),
                     "confidence_score": score,
+                    "feature_request": result["extraction"].get("feature_request"),
                     "llm_model": result["llm_model"],
                     "raw_response": result["raw_response"],
                     "analyzed_at": datetime.utcnow().isoformat(),
-                    "wishlist_pain_point": result["extraction"].get("wishlist_pain_point"),
-                    "price_behavior": result["extraction"].get("price_behavior"),
-                    "feature_request": result["extraction"].get("feature_request"),
-                    "competitor_mention": result["extraction"].get("competitor_mention"),
                 }
                 db.insert_extraction(extraction_record)
                 db.insert_tags(extraction_record["extraction_id"], tags)
@@ -150,9 +153,9 @@ def main():
                 all_extractions.append(extraction_data)
                 enriched.append(extraction_data)
 
-                blocker = result['extraction'].get('purchase_blocker') or 'None'
-                persona = result['extraction'].get('shopper_persona') or 'Unknown'
-                print(f"      ↳ Extracted & Saved: blocker='{blocker[:45]}...', persona='{persona}', score={score:.2f}", flush=True)
+                failure = result['extraction'].get('retrieval_failure_point') or 'None'
+                persona = result['extraction'].get('user_persona') or 'Unknown'
+                print(f"      ↳ Extracted & Saved: failure='{failure}', persona='{persona}', score={score:.2f}", flush=True)
 
         print(f"      → {len(all_extractions)} successful extractions from {len(relevant_docs)} documents", flush=True)
     else:

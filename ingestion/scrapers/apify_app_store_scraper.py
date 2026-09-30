@@ -17,17 +17,14 @@ from .base_scraper import BaseScraper
 class ApifyAppStoreScraper(BaseScraper):
     """Scrapes historical iOS reviews via Apify Actor."""
 
-    APP_ID = "907394059"
-    DEFAULT_COUNTRIES = ["in", "us", "gb", "ae", "ca", "sg", "au", "sa", "kw", "qa", "my", "nz"]
+    APP_ID = "962194608"
+    DEFAULT_COUNTRIES = ["in", "us", "gb", "ca", "au", "sg", "de", "fr"]
 
-    WISHLIST_KEYWORDS = [
-        "wishlist", "wish list", "wish-list", "wishlisted",
-        "save for later", "saved for later", "save", "saved",
-        "cart", "bag", "buy later", "buying later",
-        "price drop", "out of stock", "price increase", "price hike",
-        "heart", "bookmark", "collection", "discount", "coupon",
-        "platform fee", "expensive", "not buying", "abandoned",
-        "size confusion", "outfit", "recommendation"
+    RETRIEVAL_KEYWORDS = [
+        "search", "find", "can't find", "cant find", "remember",
+        "lost photo", "old photo", "receipt", "screenshot", "medicine",
+        "album", "scroll", "scrolling", "not finding", "disappeared",
+        "query", "face", "location", "date", "year", "tag"
     ]
 
     def __init__(self, token: Optional[str] = None, app_id: Optional[str] = None):
@@ -113,7 +110,7 @@ class ApifyAppStoreScraper(BaseScraper):
 
                     if filter_wishlist:
                         text_lower = full_text.lower()
-                        if not any(kw in text_lower for kw in self.WISHLIST_KEYWORDS):
+                        if not any(kw in text_lower for kw in self.RETRIEVAL_KEYWORDS):
                             continue
 
                     seen_ids.add(source_id)

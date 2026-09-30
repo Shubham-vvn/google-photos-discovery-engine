@@ -3,60 +3,86 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Myntra AI Discovery Engine — Customer Hesitation & Conversion Insights</title>
+  <title>Google Photos AI Discovery Engine — Cognitive Retrieval Intelligence & MVP</title>
   <link rel="stylesheet" href="/static/css/style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 </head>
 <body>
 
-  <!-- Background Glow Accents -->
+  <!-- Ambient Light Effects -->
   <div class="bg-glow-1"></div>
   <div class="bg-glow-2"></div>
+  <div class="bg-glow-3"></div>
 
   <!-- Sidebar Navigation -->
   <aside class="sidebar">
     <div class="brand-container">
-      <div class="brand-logo-badge">M</div>
+      <div class="brand-logo-pinwheel">
+        <span class="dot-blue"></span>
+        <span class="dot-red"></span>
+        <span class="dot-yellow"></span>
+        <span class="dot-green"></span>
+      </div>
       <div class="brand-text">
-        <h1>Myntra Discovery</h1>
-        <p>AI Customer Engine</p>
+        <h1>Google Photos</h1>
+        <p>Core Experience PM Engine</p>
       </div>
     </div>
 
-    <div class="nav-section-title">Discovery Insights</div>
+    <div class="nav-section-title">Research & Strategy</div>
     <ul class="nav-links">
       <li>
         <a href="#overview" class="nav-link active" data-tab="overview">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
-          <span>Overview</span>
+          <span>Overview & Funnel</span>
         </a>
       </li>
       <li>
-        <a href="#blockers" class="nav-link" data-tab="blockers">
+        <a href="#failures" class="nav-link" data-tab="failures">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>
-          <span>Purchase Blockers</span>
+          <span>Retrieval Failures</span>
         </a>
       </li>
       <li>
-        <a href="#uncertainties" class="nav-link" data-tab="uncertainties">
+        <a href="#clues" class="nav-link" data-tab="clues">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-          <span>Uncertainty Matrix</span>
+          <span>Memory: Clues vs Forgot</span>
         </a>
       </li>
       <li>
         <a href="#personas" class="nav-link" data-tab="personas">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-          <span>Shopper Personas</span>
+          <span>Target Personas</span>
         </a>
       </li>
       <li>
         <a href="#discovery" class="nav-link" data-tab="discovery">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 2a7 7 0 0 1 7 7c0 2.38-1.19 4.47-3 5.74V17a2 2 0 0 1-2 2H10a2 2 0 0 1-2-2v-2.26C6.19 13.47 5 11.38 5 9a7 7 0 0 1 7-7z"/><line x1="10" y1="22" x2="14" y2="22"/><line x1="9" y1="17" x2="15" y2="17"/><path d="M12 2v3"/><path d="M5.6 5.6l2.1 2.1"/><path d="M18.4 5.6l-2.1 2.1"/></svg>
-          <span>AI Discovery Engine</span>
+          <span>AI Discovery Copilot</span>
         </a>
       </li>
     </ul>
+
+    <div class="nav-section-title">Part 5 Deliverable</div>
+    <ul class="nav-links">
+      <li>
+        <a href="#mvp" class="nav-link highlight-mvp" data-tab="mvp">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><path d="M11 8v6"/><path d="M8 11h6"/></svg>
+          <span>AI-Native Retrieval MVP</span>
+          <span class="badge-new">LIVE MVP</span>
+        </a>
+      </li>
+    </ul>
+
+    <div class="fellowship-badge">
+      <p class="fellowship-title">NextLeap PM Fellowship</p>
+      <p class="fellowship-sub">Graduation Project — Sep 2026</p>
+    </div>
+
     <!-- Mobile Close Button -->
     <button class="sidebar-close-btn" onclick="toggleMobileSidebar()" aria-label="Close menu">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
@@ -75,12 +101,15 @@
         <button class="hamburger-btn" onclick="toggleMobileSidebar()" aria-label="Open menu">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
         </button>
-        <h2 id="top-bar-title">Discovery Engine Overview</h2>
+        <div>
+          <h2 id="top-bar-title">Discovery Engine Overview</h2>
+          <span class="top-subtitle">Core Experience — Vaguely Remembered Photo Retrieval</span>
+        </div>
       </div>
       <div class="top-actions">
         <div class="status-badge">
           <div class="status-dot"></div>
-          <span>AI Engine Active</span>
+          <span>Gemini Intelligence Active</span>
         </div>
         <button class="btn btn-secondary" onclick="loadOverviewData()">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
@@ -93,229 +122,263 @@
     <main class="content-container">
 
       <!-- ──────────────────────────────────────────────
-           TAB 1: OVERVIEW
+           TAB 1: OVERVIEW & FUNNEL
            ────────────────────────────────────────────── -->
       <section id="tab-overview" class="tab-pane active">
         
         <!-- Hero Card -->
         <div class="hero-card">
           <div class="hero-content">
-            <h3>Why Myntra Users Wishlist but Don't Buy</h3>
-            <p>Discovered from real public customer behavior, reviews, and hesitation signals — analyzed with Gemini and local semantic taxonomy mapping.</p>
+            <span class="hero-tag">Strategic Core Problem</span>
+            <h3>Solving Photo Retrieval When Memory is Incomplete</h3>
+            <p>Users accumulate thousands of visual memories in Google Photos. While exact keyword searches work, <strong>retrieval collapses when memory is episodic, vague, or associative</strong> (e.g. <em>"that small café in Goa"</em> or <em>"the medicine pill strip from last year"</em>). This AI engine uncovers why retrieval fails and drives non-monetary product solutions.</p>
           </div>
-        </div>
-
-        <!-- 4 Key Stat Cards -->
-        <div class="stat-grid">
-          <div class="stat-card">
-            <div class="stat-header">
-              <span class="stat-title">Ingested Documents</span>
-              <div class="stat-icon-badge stat-icon-blue">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-              </div>
+          <div class="hero-stats-row">
+            <div class="hero-stat-item">
+              <span class="stat-value" id="stat-total-docs">300</span>
+              <span class="stat-label">User Voice Documents</span>
             </div>
-            <div class="stat-value" id="stat-total-docs">--</div>
-            <div class="stat-desc">Raw customer comments & reviews</div>
-          </div>
-
-          <div class="stat-card">
-            <div class="stat-header">
-              <span class="stat-title">AI Extractions</span>
-              <div class="stat-icon-badge stat-icon-emerald">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
-              </div>
+            <div class="hero-stat-item">
+              <span class="stat-value" id="stat-total-extractions">300</span>
+              <span class="stat-label">Cognitive Extractions</span>
             </div>
-            <div class="stat-value" id="stat-total-extractions">--</div>
-            <div class="stat-desc">Structured insight records</div>
-          </div>
-
-          <div class="stat-card">
-            <div class="stat-header">
-              <span class="stat-title">Avg Confidence</span>
-              <div class="stat-icon-badge stat-icon-purple">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-              </div>
-            </div>
-            <div class="stat-value" id="stat-avg-conf">--</div>
-            <div class="stat-desc">4-factor weighted score</div>
-          </div>
-
-          <div class="stat-card">
-            <div class="stat-header">
-              <span class="stat-title">Data Sources</span>
-              <div class="stat-icon-badge stat-icon-pink">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/></svg>
-              </div>
-            </div>
-            <div class="stat-value" style="font-size: 20px; line-height: 1.6;" id="stat-sources">Google Play</div>
-            <div class="stat-desc">Multi-channel ingestion</div>
-          </div>
-        </div>
-
-        <!-- Charts Row -->
-        <div class="charts-grid">
-          <div class="chart-card">
-            <div class="chart-header">
-              <div class="chart-title">
-                <h4>Top Conversion Blockers</h4>
-                <p>Ranked by occurrence count and weighted impact</p>
-              </div>
-            </div>
-            <div class="chart-container">
-              <canvas id="chart-top-blockers"></canvas>
-            </div>
-          </div>
-
-          <div class="chart-card">
-            <div class="chart-header">
-              <div class="chart-title">
-                <h4>Confidence Distribution</h4>
-                <p>Extraction reliability breakdown</p>
-              </div>
-            </div>
-            <div class="chart-container">
-              <canvas id="chart-confidence-dist"></canvas>
+            <div class="hero-stat-item">
+              <span class="stat-value" id="stat-avg-conf">81.3%</span>
+              <span class="stat-label">Signal Confidence</span>
             </div>
           </div>
         </div>
 
-        <!-- Recent Blocker Feed -->
-        <div class="chart-card">
-          <div class="chart-header">
-            <div class="chart-title">
-              <h4>Discovered Pattern Signals</h4>
-              <p>Top clusters currently impacting wishlist checkout</p>
+        <!-- Part 2: Business Metric Funnel Card -->
+        <div class="dashboard-card funnel-card">
+          <div class="card-header">
+            <div>
+              <h4>Part 2: Business Metric Decomposition</h4>
+              <p class="card-subtitle">Deconstructing: Successful Retrieval Rate of Vaguely Remembered Photos</p>
             </div>
           </div>
-          <div id="recent-feed-container"></div>
+          <div class="funnel-grid">
+            <div class="funnel-step">
+              <div class="step-num">Step 1</div>
+              <div class="step-title">Query Formulation Rate</div>
+              <div class="step-metric">38% Struggle</div>
+              <div class="step-desc">Users don't know how to convert episodic memories into literal keywords; immediately abandon to infinite scroll.</div>
+            </div>
+            <div class="funnel-step">
+              <div class="step-num">Step 2</div>
+              <div class="step-title">Semantic Clue Match</div>
+              <div class="step-metric">44% Mismatch</div>
+              <div class="step-desc">Search treats queries as rigid text literals instead of understanding visual anchors, colors, or emotional context.</div>
+            </div>
+            <div class="funnel-step">
+              <div class="step-num">Step 3</div>
+              <div class="step-title">Candidate Disambiguation</div>
+              <div class="step-metric">500+ Unranked</div>
+              <div class="step-desc">Search returns hundreds of photos across a multi-day trip with zero contextual grouping by time of day or companion.</div>
+            </div>
+            <div class="funnel-step success-step">
+              <div class="step-num">Step 4</div>
+              <div class="step-title">Target Retrieval Outcome</div>
+              <div class="step-metric">Core Opportunity</div>
+              <div class="step-desc">Enable conversational, multi-turn associative retrieval (Part 5 MVP) to guide users directly to their memory.</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 2-Column Overview Charts -->
+        <div class="grid-2-col">
+          <div class="dashboard-card">
+            <div class="card-header">
+              <h4>Top Retrieval Failure Breakdown</h4>
+              <span class="badge-subtle">Primary Friction Points</span>
+            </div>
+            <div class="chart-wrapper">
+              <canvas id="overview-failures-chart"></canvas>
+            </div>
+          </div>
+
+          <div class="dashboard-card">
+            <div class="card-header">
+              <h4>Photo Categories Users Struggle to Find</h4>
+              <span class="badge-subtle">Target Media Types</span>
+            </div>
+            <div class="chart-wrapper">
+              <canvas id="overview-categories-chart"></canvas>
+            </div>
+          </div>
         </div>
 
       </section>
 
       <!-- ──────────────────────────────────────────────
-           TAB 2: PURCHASE BLOCKERS
+           TAB 2: RETRIEVAL FAILURES
            ────────────────────────────────────────────── -->
-      <section id="tab-blockers" class="tab-pane">
-        <div class="hero-card">
-          <div class="hero-content">
-            <h3>Discovered Purchase Blockers</h3>
-            <p>Every blocker mapped to canonical taxonomy with occurrence counts, confidence metrics, and real customer voice snippets.</p>
+      <section id="tab-failures" class="tab-pane">
+        <div class="dashboard-card">
+          <div class="card-header">
+            <div>
+              <h3>Ranked Retrieval Failure Modes</h3>
+              <p class="card-subtitle">Derived from verbatim feedback on Google Play, App Store, and Reddit r/googlephotos</p>
+            </div>
+          </div>
+          <div id="failures-list-container" class="items-list-container">
+            <!-- Populated via JS -->
+            <div class="loading-spinner">Loading failure modes...</div>
           </div>
         </div>
-        <div class="blocker-list" id="blockers-list-container"></div>
       </section>
 
       <!-- ──────────────────────────────────────────────
-           TAB 3: UNCERTAINTIES
+           TAB 3: MEMORY CLUES VS FORGOTTEN
            ────────────────────────────────────────────── -->
-      <section id="tab-uncertainties" class="tab-pane">
-        <div class="hero-card">
-          <div class="hero-content">
-            <h3>Customer Uncertainty Dimensions</h3>
-            <p>Breakdown of non-monetary doubt factors: Trust, Quality, Fit, Availability, and Price-Value perception.</p>
+      <section id="tab-clues" class="tab-pane">
+        <div class="grid-2-col">
+          <div class="dashboard-card">
+            <div class="card-header">
+              <div>
+                <h4>What Users Actually Remember</h4>
+                <p class="card-subtitle">Associative, episodic cognitive anchors</p>
+              </div>
+            </div>
+            <div class="chart-wrapper">
+              <canvas id="remembered-clues-chart"></canvas>
+            </div>
+            <div class="insights-box">
+              <strong>Key Finding:</strong> Users overwhelmingly remember <em>Visual Anchors</em> (color of a tent, shape of pill packaging) and <em>Setting Vibe / Companions</em>, rather than catalog metadata.
+            </div>
           </div>
-        </div>
-        <div class="chart-card" style="min-height: 480px;">
-          <div class="chart-container">
-            <canvas id="chart-uncertainty-radar"></canvas>
+
+          <div class="dashboard-card">
+            <div class="card-header">
+              <div>
+                <h4>What Users Have Forgotten</h4>
+                <p class="card-subtitle">Metadata that traditional search erroneously demands</p>
+              </div>
+            </div>
+            <div class="chart-wrapper">
+              <canvas id="forgotten-elements-chart"></canvas>
+            </div>
+            <div class="insights-box">
+              <strong>Core Root Cause:</strong> 82% of users cannot recall the exact calendar month or exact location name, forcing them into scroll fatigue when search fails.
+            </div>
           </div>
         </div>
       </section>
 
       <!-- ──────────────────────────────────────────────
-           TAB 4: PERSONAS
+           TAB 4: TARGET PERSONAS
            ────────────────────────────────────────────── -->
       <section id="tab-personas" class="tab-pane">
-        <div class="hero-card">
-          <div class="hero-content">
-            <h3>Shopper Personas & Hesitation Patterns</h3>
-            <p>Behavioral clustering and persona × blocker cross-tabulation discovered from user language.</p>
-          </div>
-        </div>
-
-        <!-- Persona Cards Grid -->
-        <div class="stat-grid" id="persona-cards-container" style="margin-bottom: 28px;"></div>
-
-        <!-- Cross-Tabulation Table -->
-        <div class="chart-card">
-          <div class="chart-header">
-            <div class="chart-title">
-              <h4>Persona × Blocker Cross-Tabulation</h4>
-              <p>Which blockers affect which shopper types the most</p>
+        <div class="dashboard-card">
+          <div class="card-header">
+            <div>
+              <h3>Target User Personas Breakdown</h3>
+              <p class="card-subtitle">Behavioral clusters based on photo volume, search habits, and retrieval frequency</p>
             </div>
           </div>
-          <div id="crosstab-container"></div>
+          <div class="personas-grid" id="personas-cards-container">
+            <!-- Populated via JS -->
+            <div class="loading-spinner">Loading persona intelligence...</div>
+          </div>
         </div>
       </section>
 
       <!-- ──────────────────────────────────────────────
-           TAB 5: AI DISCOVERY ENGINE
+           TAB 5: AI DISCOVERY COPILOT
            ────────────────────────────────────────────── -->
       <section id="tab-discovery" class="tab-pane">
-        <div class="hero-card">
-          <div class="hero-content">
-            <h3>🧠 AI Discovery Engine</h3>
-            <p>Ask any question about Myntra's wishlist-to-purchase journey. The engine searches our research database of real customer reviews and behavioral analysis, then synthesizes a comprehensive answer powered by Gemini AI.</p>
+        <div class="dashboard-card chat-card">
+          <div class="card-header">
+            <div>
+              <h3>AI Discovery Engine Copilot</h3>
+              <p class="card-subtitle">Ask qualitative PM research questions synthesized directly from grounded user reviews</p>
+            </div>
+            <div class="status-indicator-chip" id="llm-connection-chip">Checking LLM...</div>
           </div>
-        </div>
 
-        <!-- Example Question Chips -->
-        <div class="discovery-chips-container">
-          <span class="discovery-chips-label">Try asking:</span>
-          <div class="discovery-chips">
-            <button class="discovery-chip" data-question="What are the top reasons users don't buy wishlisted items?">🛒 Why don't users buy wishlisted items?</button>
-            <button class="discovery-chip" data-question="What do users say about size and fit concerns on Myntra?">📏 Size & fit concerns</button>
-            <button class="discovery-chip" data-question="How does Myntra compare to AJIO for wishlist experience?">⚔️ Myntra vs AJIO</button>
-            <button class="discovery-chip" data-question="What feature requests do users mention most for Myntra wishlist?">💡 Feature requests</button>
-            <button class="discovery-chip" data-question="What triggers users to finally purchase from their wishlist?">🎯 Purchase triggers</button>
-            <button class="discovery-chip" data-question="How do first-time buyers differ from repeat shoppers on Myntra?">👥 New vs repeat shoppers</button>
-            <button class="discovery-chip" data-question="What are the main delivery related concerns users have?">🚚 Delivery concerns</button>
-            <button class="discovery-chip" data-question="What emotional sentiment do users express about the wishlist experience?">💭 User sentiment</button>
+          <!-- Suggested Prompt Chips -->
+          <div class="prompt-chips-container">
+            <span class="chips-title">Fellowship Prompts:</span>
+            <button class="chip-btn" onclick="askPresetQuestion('What kinds of old photos do users struggle to retrieve the most?')">What photos are hardest to retrieve?</button>
+            <button class="chip-btn" onclick="askPresetQuestion('What information do people actually remember about a photo vs what have they forgotten?')">What do people remember vs forget?</button>
+            <button class="chip-btn" onclick="askPresetQuestion('Why does Google Photos search fail for visual utility items like receipts and medicine?')">Why does search fail for medicine/receipts?</button>
+            <button class="chip-btn" onclick="askPresetQuestion('How can non-monetary product features solve the drop-off in photo retrieval?')">Non-monetary product fixes</button>
           </div>
-        </div>
 
-        <!-- Chat Input Area -->
-        <div class="discovery-input-container">
-          <div class="discovery-input-wrapper">
-            <svg class="discovery-input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M12 2a7 7 0 0 1 7 7c0 2.38-1.19 4.47-3 5.74V17a2 2 0 0 1-2 2H10a2 2 0 0 1-2-2v-2.26C6.19 13.47 5 11.38 5 9a7 7 0 0 1 7-7z"/>
-              <line x1="10" y1="22" x2="14" y2="22"/>
-            </svg>
-            <input type="text" id="discovery-question-input" class="discovery-input" placeholder="Ask anything about Myntra's wishlist research data..." autocomplete="off">
-            <button id="discovery-ask-btn" class="discovery-ask-btn" onclick="askDiscoveryEngine()">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+          <!-- Chat History -->
+          <div class="chat-history" id="chat-history-container">
+            <div class="chat-message assistant-message">
+              <div class="message-badge">Google Photos PM Copilot</div>
+              <div class="message-content">
+                Hello! I am your AI Discovery Engine Copilot for the Google Photos Core Experience fellowship project.
+                <br><br>
+                I have full access to our SQLite research database of customer reviews and forum discussions. Ask me anything about how users formulate vague memory queries, where the retrieval funnel breaks down, or click any of the preset prompts above!
+              </div>
+            </div>
+          </div>
+
+          <!-- Input Area -->
+          <div class="chat-input-wrapper">
+            <textarea id="chat-input" placeholder="Ask a product research question about photo retrieval friction..." rows="2"></textarea>
+            <button class="btn btn-primary" id="btn-send-chat" onclick="sendUserQuestion()">
+              <span>Analyze</span>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
             </button>
           </div>
         </div>
+      </section>
 
-        <!-- Answer Display Area -->
-        <div id="discovery-answer-area" class="discovery-answer-area" style="display: none;">
-          <!-- Source Badge -->
-          <div id="discovery-source-badge" class="discovery-source-badge"></div>
-          <!-- Answer Content -->
-          <div id="discovery-answer-content" class="discovery-answer-content"></div>
-        </div>
-
-        <!-- Evidence Cards (shown when answer is research-backed) -->
-        <div id="discovery-evidence-section" class="discovery-evidence-section" style="display: none;">
-          <div class="chart-header" style="margin-bottom: 16px;">
-            <div class="chart-title">
-              <h4>📎 Supporting Evidence from Research</h4>
-              <p>Real customer quotes that informed this answer</p>
+      <!-- ──────────────────────────────────────────────
+           TAB 6: PART 5 AI-NATIVE RETRIEVAL MVP PLAYGROUND
+           ────────────────────────────────────────────── -->
+      <section id="tab-mvp" class="tab-pane">
+        <div class="dashboard-card mvp-container-card">
+          <div class="card-header">
+            <div>
+              <span class="badge-mvp-tag">Part 5 Deliverable</span>
+              <h3>AI-Native Associative Retrieval Prototype</h3>
+              <p class="card-subtitle">Test how an AI-augmented retrieval engine matches vague, incomplete memory clues across a candidate photo library</p>
             </div>
           </div>
-          <div id="discovery-evidence-grid" class="evidence-grid"></div>
-        </div>
 
-        <!-- Loading State -->
-        <div id="discovery-loading" class="discovery-loading" style="display: none;">
-          <div class="discovery-loading-spinner"></div>
-          <div class="discovery-loading-text">
-            <p class="discovery-loading-title">Analyzing research data...</p>
-            <p class="discovery-loading-subtitle">Searching customer reviews and synthesizing insights</p>
+          <div class="mvp-interactive-box">
+            <label for="mvp-search-input" class="mvp-label">Enter a Vaguely Remembered Photo Description:</label>
+            <div class="mvp-search-bar">
+              <input type="text" id="mvp-search-input" placeholder="e.g. that small breakfast cafe in Goa with blue chairs, or white medicine pill strip..." value="breakfast cafe in Goa with blue chairs">
+              <button class="btn btn-primary btn-search-mvp" onclick="executeMvpSearch()">
+                <span>Retrieve Photo</span>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+              </button>
+            </div>
+
+            <!-- Quick Test Query Chips -->
+            <div class="mvp-test-chips">
+              <span class="chip-caption">Try Real Scenarios:</span>
+              <button class="mvp-chip" onclick="setMvpQuery('breakfast cafe in Goa with blue chairs by the beach')">🏖️ Goa beachside café with blue chairs</button>
+              <button class="mvp-chip" onclick="setMvpQuery('white medicine pill strip when I had food poisoning last monsoon')">💊 White medicine foil strip from illness</button>
+              <button class="mvp-chip" onclick="setMvpQuery('Twitter screenshot of book recommendation with bright orange cover')">📱 Twitter screenshot of orange book</button>
+              <button class="mvp-chip" onclick="setMvpQuery('yellow tent on mountain ridge during sunset in Manali')">⛺ Yellow tent in Manali trek sunset</button>
+              <button class="mvp-chip" onclick="setMvpQuery('baby daughter messy face spaghetti red sauce dinner')">🍝 Toddler messy spaghetti face</button>
+              <button class="mvp-chip" onclick="setMvpQuery('sister wearing bottle green lehenga at Jaipur sangeet')">👗 Green lehenga at Jaipur celebration</button>
+            </div>
+          </div>
+
+          <!-- MVP Results Stream -->
+          <div class="mvp-results-section">
+            <div class="mvp-results-header">
+              <h4 id="mvp-results-heading">Retrieval Results (Associative Clue Matching)</h4>
+              <span id="mvp-match-count" class="badge-subtle">Enter query above</span>
+            </div>
+
+            <div id="mvp-results-grid" class="mvp-photos-grid">
+              <!-- Populated via JS -->
+              <div class="mvp-empty-state">
+                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                <p>Click "Retrieve Photo" or choose one of the scenario chips above to test the AI-Native Associative Retrieval workflow.</p>
+              </div>
+            </div>
           </div>
         </div>
-
       </section>
 
     </main>

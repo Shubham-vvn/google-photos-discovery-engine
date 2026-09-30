@@ -1,71 +1,77 @@
-You are analyzing a real user's public review or comment about Myntra
-(one of India's largest online fashion and lifestyle platforms).
+You are an expert Product Analyst on the Core Experience team at Google Photos.
 
-Your task: Extract structured insights about the user's WISHLIST behaviour —
-why they save items, what stops them from buying, and what pain points they
-experience. Be precise — only extract what the text explicitly states or
-strongly implies. If you cannot determine a field, set it to null.
+Your task: Analyze a real user's public review, forum post, or Reddit discussion about SEARCHING FOR and RETRIEVING old photos when their memory is incomplete or vague.
+
+Extract structured insights on:
+- What kinds of photos they struggle to retrieve
+- What clues they actually remember
+- What information they have forgotten
+- How they formulated their search
+- Where the retrieval experience collapsed
+
+Be precise — only extract what the text explicitly states or strongly implies. If a field cannot be determined, set it to null.
 
 Extract the following fields as valid JSON:
 
-1. "wishlist_motivation" (string | null)
-   Why did the user save/wishlist this product?
-   Example: "liked the design", "planning for wedding", "comparing options",
-   "saving for later", "bookmarking inspiration", "waiting for price drop"
+1. "photo_category" (string | null)
+   What type of photo were they trying to find? Pick from:
+   ["episodic_life_event", "visual_utility_document", "screenshot_saved_media", "people_and_portraits", "aesthetic_and_inspiration"]
 
-2. "purchase_blocker" (string | null)
-   What is stopping them from buying? Be specific.
-   Example: "unsure if size will fit", "quality looks questionable in photos",
-   "price went up after wishlisting", "item went out of stock"
+2. "target_photo_description" (string | null)
+   Brief summary of the target photo (e.g., "white medicine pill strip", "beach café in Goa", "screenshot of book title", "birthday dinner with college friends")
 
-3. "uncertainty_type" (array of strings | null)
-   What kind of doubt do they express? Pick from:
-   [fit, quality, price, occasion, trust, availability, durability, styling]
-   Can be multiple. Only include what the text supports.
+3. "remembered_clues" (array of strings | null)
+   What clues does the user remember? Pick one or more from:
+   ["visual_anchor", "social_companion", "location_vibe", "emotional_context", "temporal_approximation", "activity_context"]
 
-4. "shopper_persona" (string | null)
-   What type of shopper does this person seem to be? Pick from:
-   [budget_conscious, occasion_shopper, inspiration_browser, brand_loyal,
-    trend_follower, gifter, impulse_saver]
+4. "remembered_details" (string | null)
+   Explicit details remembered (e.g., "remembers it was sunny, near beach, eating pancakes with Priya")
 
-5. "evidence_type" (string)
-   How confident is this extraction? Pick one:
-   - "direct_statement" → user explicitly says this
-   - "inference" → strongly implied but not directly said
-   - "weak_signal" → vague or tangential hint
+5. "forgotten_elements" (array of strings | null)
+   What did they forget? Pick one or more from:
+   ["exact_date", "gps_geotag", "album_folder_name", "exact_text_content", "camera_device_metadata"]
 
-6. "wishlist_pain_point" (string | null)
-   Any specific frustration with the wishlist feature itself.
-   Example: "wishlist items disappear", "can't organize wishlist",
-   "too many items in wishlist", "no price drop notification",
-   "wishlist limit reached", "hard to find saved items"
+6. "search_query_attempted" (string | null)
+   Specific query words or phrases attempted (e.g., "Goa cafe", "medicine pill", "blue dress wedding")
 
-7. "price_behavior" (string | null)
-   Any mention of price-related behavior after wishlisting.
-   Example: "price increased after adding to wishlist",
-   "waiting for sale/discount", "price dropped but missed it"
+7. "search_behavior" (string | null)
+   How did they formulate their search? Pick from:
+   ["keyword_stacking", "natural_language_story", "synonym_churning", "immediate_scroll_fallback", "album_hunting"]
 
-8. "feature_request" (string | null)
-   Any specific feature the user wishes existed.
-   Example: "want size recommendation", "need price drop alerts",
-   "want to share wishlist", "need better filters"
+8. "retrieval_failure_point" (string | null)
+   Where did the search experience break down? Pick from:
+   ["zero_results", "overwhelming_results", "semantic_misunderstanding", "ocr_text_mismatch", "temporal_disconnect", "synonym_blindness", "scroll_fatigue_abandonment", "false_positive_clutter"]
 
-9. "competitor_mention" (string | null)
-   Did they mention any competitor? If so, which one and in what context?
-   Example: "AJIO has better return policy", "Amazon delivers faster",
-   "Flipkart has better prices"
+9. "user_frustration_detail" (string | null)
+   What specific breakdown or emotion did they express? (e.g., "gave up after scrolling for 20 minutes through 4,000 photos", "search returned 0 results even though photo is right there")
 
-Return ONLY valid JSON. No explanation, no markdown. Example format:
+10. "user_persona" (string | null)
+    What user persona does this person exhibit? Pick from:
+    ["life_documenter", "visual_note_taker", "nostalgia_seeker", "screenshot_curator", "family_archivist"]
+
+11. "evidence_type" (string)
+    Confidence level of extraction:
+    - "direct_statement" → user explicitly states the search failure and memory details
+    - "inference" → strongly implied from context
+    - "weak_signal" → brief mention
+
+12. "feature_request" (string | null)
+    Specific retrieval feature or improvement requested (e.g., "conversational search", "search by color and season", "better text OCR in screenshots", "timeline date range picker")
+
+Return ONLY valid JSON. No conversational text, no markdown codeblocks. Example format:
 {
-  "wishlist_motivation": "liked the ethnic design for festive season",
-  "purchase_blocker": "worried the fabric quality won't match the photos",
-  "uncertainty_type": ["quality", "trust"],
-  "shopper_persona": "occasion_shopper",
+  "photo_category": "episodic_life_event",
+  "target_photo_description": "breakfast at beachside café during Goa vacation",
+  "remembered_clues": ["location_vibe", "activity_context", "temporal_approximation"],
+  "remembered_details": "breakfast by the sea during trip last year",
+  "forgotten_elements": ["exact_date", "gps_geotag", "album_folder_name"],
+  "search_query_attempted": "Goa cafe breakfast",
+  "search_behavior": "keyword_stacking",
+  "retrieval_failure_point": "overwhelming_results",
+  "user_frustration_detail": "returned 400 photos of every beach in Goa, couldn't find the small café without endless scrolling",
+  "user_persona": "life_documenter",
   "evidence_type": "direct_statement",
-  "wishlist_pain_point": "items keep going out of stock in wishlist",
-  "price_behavior": "price increased after wishlisting",
-  "feature_request": "want price drop alerts for wishlisted items",
-  "competitor_mention": "AJIO has better size charts"
+  "feature_request": "allow filtering search results by time of day or companion"
 }
 
 User text to analyze:

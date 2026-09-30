@@ -24,15 +24,17 @@
   --text-muted: #646b82;
   --text-accent: #818cf8;
 
-  /* Accent Gradients & Colors */
-  --myntra-pink: #ff3f6c;
-  --myntra-orange: #ff905a;
-  --accent-primary: #6366f1;
-  --accent-secondary: #a855f7;
-  --accent-cyan: #06b6d4;
-  --accent-emerald: #10b981;
-  --accent-amber: #f59e0b;
-  --accent-rose: #f43f5e;
+  /* Google Photos Brand Colors */
+  --google-blue: #1a73e8;
+  --google-red: #ea4335;
+  --google-yellow: #fbbc04;
+  --google-green: #34a853;
+  --accent-primary: #1a73e8;
+  --accent-secondary: #8ab4f8;
+  --accent-cyan: #24c1e0;
+  --accent-emerald: #34a853;
+  --accent-amber: #fbbc04;
+  --accent-rose: #ea4335;
 
   /* Confidence Colors */
   --conf-high: #10b981;
@@ -1087,4 +1089,370 @@ body {
   .stat-grid {
     grid-template-columns: 1fr;
   }
+}
+
+/* ───────────────────────────────────────────────────────────────────
+   Google Photos Pinwheel Logo Badge
+   ─────────────────────────────────────────────────────────────────── */
+.brand-logo-pinwheel {
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--border-medium);
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  padding: 8px;
+  gap: 4px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.3);
+  flex-shrink: 0;
+}
+.brand-logo-pinwheel span {
+  border-radius: 50%;
+  display: block;
+  transition: transform 0.2s ease;
+}
+.dot-blue { background: var(--google-blue); }
+.dot-red { background: var(--google-red); }
+.dot-yellow { background: var(--google-yellow); }
+.dot-green { background: var(--google-green); }
+
+/* Fellowship & MVP Badges */
+.fellowship-badge {
+  margin-top: auto;
+  padding: 14px 16px;
+  background: rgba(26, 115, 232, 0.08);
+  border: 1px solid rgba(26, 115, 232, 0.25);
+  border-radius: var(--radius-md);
+  margin-bottom: 8px;
+}
+.fellowship-title {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 13px;
+  color: #fff;
+  margin: 0 0 2px 0;
+}
+.fellowship-sub {
+  font-size: 11px;
+  color: var(--text-accent);
+  margin: 0;
+}
+
+.badge-new {
+  margin-left: auto;
+  background: linear-gradient(135deg, var(--google-blue), var(--google-green));
+  color: #fff;
+  font-size: 9px;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 6px;
+  letter-spacing: 0.5px;
+}
+
+.badge-mvp-tag {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--google-yellow);
+  background: rgba(251, 188, 4, 0.12);
+  border: 1px solid rgba(251, 188, 4, 0.3);
+  padding: 3px 8px;
+  border-radius: 6px;
+  margin-bottom: 6px;
+}
+
+/* Part 2: Funnel Grid */
+.funnel-card {
+  margin-bottom: 24px;
+}
+.funnel-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
+  margin-top: 16px;
+}
+.funnel-step {
+  background: var(--bg-surface-elevated);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 18px 16px;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  transition: transform 0.2s, border-color 0.2s;
+}
+.funnel-step:hover {
+  transform: translateY(-2px);
+  border-color: var(--border-medium);
+}
+.funnel-step .step-num {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+.funnel-step .step-title {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 14px;
+  color: var(--text-primary);
+  margin-bottom: 8px;
+}
+.funnel-step .step-metric {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--google-red);
+  margin-bottom: 8px;
+}
+.funnel-step .step-desc {
+  font-size: 12px;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+.funnel-step.success-step {
+  border-color: rgba(52, 168, 83, 0.35);
+  background: rgba(52, 168, 83, 0.06);
+}
+.funnel-step.success-step .step-metric {
+  color: var(--google-green);
+}
+
+/* Prompt Chips */
+.prompt-chips-container {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 16px;
+  background: rgba(255, 255, 255, 0.02);
+  border-bottom: 1px solid var(--border-subtle);
+}
+.chips-title {
+  font-size: 12px;
+  color: var(--text-muted);
+  font-weight: 600;
+}
+.chip-btn {
+  background: var(--bg-surface-elevated);
+  border: 1px solid var(--border-medium);
+  color: var(--text-secondary);
+  font-size: 12px;
+  padding: 6px 12px;
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.chip-btn:hover {
+  background: rgba(26, 115, 232, 0.15);
+  color: #fff;
+  border-color: var(--google-blue);
+}
+
+.status-indicator-chip {
+  font-size: 11px;
+  padding: 4px 10px;
+  border-radius: var(--radius-full);
+  background: rgba(52, 168, 83, 0.12);
+  color: var(--google-green);
+  border: 1px solid rgba(52, 168, 83, 0.3);
+}
+
+/* Part 5: AI-Native Retrieval MVP */
+.mvp-container-card {
+  border: 1px solid rgba(26, 115, 232, 0.3);
+  box-shadow: 0 14px 40px -10px rgba(26, 115, 232, 0.2);
+}
+.mvp-interactive-box {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  padding: 24px;
+  margin-bottom: 28px;
+}
+.mvp-label {
+  display: block;
+  font-family: var(--font-display);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 12px;
+}
+.mvp-search-bar {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+.mvp-search-bar input {
+  flex: 1;
+  background: var(--bg-base);
+  border: 1px solid var(--border-medium);
+  border-radius: var(--radius-md);
+  padding: 14px 18px;
+  color: #fff;
+  font-size: 15px;
+  font-family: var(--font-body);
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.mvp-search-bar input:focus {
+  outline: none;
+  border-color: var(--google-blue);
+  box-shadow: 0 0 0 3px rgba(26, 115, 232, 0.25);
+}
+.btn-search-mvp {
+  padding: 0 24px;
+  background: var(--google-blue);
+  border: none;
+  font-weight: 600;
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  color: #fff;
+  transition: background 0.2s;
+}
+.btn-search-mvp:hover {
+  background: #1558b0;
+}
+.mvp-test-chips {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+.chip-caption {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+.mvp-chip {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-secondary);
+  font-size: 12px;
+  padding: 6px 12px;
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.mvp-chip:hover {
+  background: rgba(26, 115, 232, 0.15);
+  color: #fff;
+  border-color: var(--google-blue);
+}
+
+/* MVP Results Section */
+.mvp-results-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+.mvp-results-header h4 {
+  font-family: var(--font-display);
+  font-size: 16px;
+  margin: 0;
+  color: var(--text-primary);
+}
+.mvp-photos-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 20px;
+}
+.mvp-photo-card {
+  background: var(--bg-surface-elevated);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.2s, border-color 0.2s;
+}
+.mvp-photo-card:hover {
+  transform: translateY(-3px);
+  border-color: var(--border-medium);
+}
+.mvp-photo-img-wrap {
+  width: 100%;
+  height: 200px;
+  overflow: hidden;
+  background: #111;
+  position: relative;
+}
+.mvp-photo-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+.mvp-photo-card:hover .mvp-photo-img {
+  transform: scale(1.04);
+}
+.mvp-confidence-pill {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(6px);
+  padding: 4px 10px;
+  border-radius: var(--radius-full);
+  font-size: 11px;
+  font-weight: 700;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #fff;
+}
+.mvp-photo-info {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  flex: 1;
+}
+.mvp-photo-title {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 15px;
+  color: var(--text-primary);
+  margin: 0;
+}
+.mvp-meta-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  font-size: 12px;
+  color: var(--text-muted);
+}
+.clues-tags-wrap {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.clue-badge {
+  font-size: 11px;
+  padding: 3px 8px;
+  background: rgba(26, 115, 232, 0.12);
+  border: 1px solid rgba(26, 115, 232, 0.25);
+  color: var(--accent-secondary);
+  border-radius: 6px;
+}
+.mvp-reasoning {
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--text-secondary);
+  background: var(--bg-surface);
+  padding: 10px;
+  border-radius: var(--radius-sm);
+  border-left: 3px solid var(--google-blue);
+  margin-top: auto;
+}
+.mvp-empty-state {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 48px 24px;
+  color: var(--text-muted);
+}
+.mvp-empty-state svg {
+  margin-bottom: 12px;
+  opacity: 0.5;
 }
