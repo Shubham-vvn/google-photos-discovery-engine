@@ -22,7 +22,7 @@ services:
       - key: GEMINI_API_KEY
         sync: false  # Set manually in Render dashboard
       - key: DB_PATH
-        value: data/myntra_discovery.db
+        value: data/photos_discovery.db
       - key: LLM_MODEL
         value: gemini-3.5-flash
       - key: LLM_RPM_LIMIT

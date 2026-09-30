@@ -19,7 +19,7 @@ PROJECT_ROOT = Path(__file__).parent.parent
 DATA_DIR = PROJECT_ROOT / "data"
 RAW_DIR = DATA_DIR / "raw"
 PROCESSED_DIR = DATA_DIR / "processed"
-DB_PATH = PROJECT_ROOT / os.getenv("DB_PATH", "data/myntra_discovery.db")
+DB_PATH = PROJECT_ROOT / os.getenv("DB_PATH", "data/photos_discovery.db")
 
 # ──────────────────────────────────────────────
 # Google Gemini (Free Tier)
@@ -34,7 +34,7 @@ LLM_DAILY_TOKEN_LIMIT = int(os.getenv("LLM_DAILY_TOKEN_LIMIT", "1000000"))
 # ──────────────────────────────────────────────
 REDDIT_CLIENT_ID = os.getenv("REDDIT_CLIENT_ID")
 REDDIT_CLIENT_SECRET = os.getenv("REDDIT_CLIENT_SECRET")
-REDDIT_USER_AGENT = os.getenv("REDDIT_USER_AGENT", "MyntraDiscoveryEngine/1.0")
+REDDIT_USER_AGENT = os.getenv("REDDIT_USER_AGENT", "GooglePhotosDiscoveryEngine/1.0")
 
 # ──────────────────────────────────────────────
 # Taxonomy

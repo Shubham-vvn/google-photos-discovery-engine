@@ -25,7 +25,7 @@ data/processed/
 data/*.sqlite
 data/*.sqlite3
 data/*.db
-!data/myntra_discovery.db
+!data/photos_discovery.db
 
 # Node / Frontend builds
 node_modules/
