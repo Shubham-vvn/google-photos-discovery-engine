@@ -13,7 +13,7 @@
 
 services:
   - type: web
-    name: myntra-discovery-dashboard
+    name: google-photos-discovery-engine
     runtime: python
     plan: free
     buildCommand: pip install -r requirements.txt
